@@ -1,0 +1,79 @@
+---
+title: "Web Scrapping"
+toc: true
+format: html
+---
+
+## `rvest` package
+We will need the `rvest` package to scrape websites.
+
+```{r, warning=FALSE, message=FALSE}
+library(rvest)
+library(tidyverse)
+```
+
+Next, we shall save the link in an object.
+
+```{r}
+link <- "https://www.nytimes.com/"
+```
+
+## Sending http request
+We can now send the HTTP get request.
+
+```{r}
+rvest::read_html(link) -> nyt_page
+```
+
+## Parsing 
+Now we shall parse HTML document.This can be done in 2 ways using the `rvest` package.
+  1. XPath
+  
+```{r, eval=FALSE}
+nyt_page |> 
+  html_elements(xpath = "")
+```
+
+  2. CSS selectors
+
+```{r, eval=FALSE}
+nyt_page |> 
+  html_elements(css = "")
+```
+
+CSS selectors example:
+
+```{r}
+nyt_page |> 
+  html_elements(css = ".indicate-hover") |> 
+  html_text()
+```
+XPath example:
+
+```{r}
+nyt_page |> 
+  html_elements(xpath = "/html/body/div/div[3]/main/div/div[1]/div/div[1]/div/div[1]/div/div/div/div[1]/div[2]/div/div/div[1]/div[1]/div/section[1]/a/div/div/p") |> 
+  html_text()
+```
+## Dynamic web scrapping
+We will see how to scrape data from 99acres.com
+
+```{r, message=FALSE, warning=FALSE}
+library(RSelenium)
+library(seleniumPipes)
+
+rd <- rsDriver(browser = "firefox", chromever = NULL)
+
+remDr <- rd$client
+
+url <- remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page1")
+
+url |> 
+  findElementsFromElement(using = "css selector", value = "#\34 16812 > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > a:nth-child(1)")
+```
+
+
+```{r}
+remoDr <- remoteDr()
+```
+
