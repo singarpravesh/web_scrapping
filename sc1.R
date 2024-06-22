@@ -61,8 +61,33 @@ remDr <- rD[["client"]]
 remDr$navigate(urls[1])
 
 
-bhk[i] <- remDr$findElements(using = "script", "//*[@type='application/ld+json']") |> 
-  sapply(function(x){x$getElementText()[[1]]})
+# Load the necessary libraries
+library(jsonlite)
+library(jsonld)
+
+# URL of the website
+url <- remDr$navigate(urls[1])
+
+
+# Send a GET request to the URL
+response <- GET(url)
+
+# Parse the HTML content
+html <- content(response, "text")
+
+# Find the JSON-LD script tag
+script_tag <- html %>% 
+  html_nodes("script[type='application/ld+json']") %>% 
+  html_text()
+
+# Parse the JSON-LD content
+data <- jsonlite::fromJSON(script_tag)
+
+# Extract the latitude and longitude
+latitude <- data$geo$latitude
+longitude <- data$geo$longitude
+
+print(paste("Latitude:", latitude, ", Longitude:", longitude))
 
 
 
