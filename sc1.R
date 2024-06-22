@@ -25,16 +25,21 @@ remDr <- rD[["client"]]
 
 remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page1")
 
-urls <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']")
-urls_list <- sapply(titleElements, function(x){x$getElementAttribute("href")}[[1]])
+urls <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
+  sapply(function(x){x$getElementAttribute("href")}[[1]])
+
+for (i in 1:2){
+  remDr$navigate(urls[i])
+  price <- remDr$findElements(using = "xpath", "//*[@class='list_header_semiBold configurationCards__configurationCardsHeading']") |> 
+    sapply(function(x){x$getElementText()[[1]]})
+  
+  }
 
 rD <- rsDriver(browser="firefox",chromever = NULL, port = netstat::free_port() , verbose=F)
 remDr <- rD[["client"]]
 remDr$navigate(titles[1])
 remDr$getCurrentUrl()
 
-price <- remDr$findElements(using = "xpath", "//*[@class='list_header_semiBold configurationCards__configurationCardsHeading']")
-prices <- sapply(price, function(x){x$getElementText()[[1]]})
 
 
 
