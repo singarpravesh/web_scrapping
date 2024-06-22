@@ -64,7 +64,7 @@ rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), ve
 remDr <- rD[["client"]]
 remDr$navigate(urls[1])
 c <- remDr$findElements(using = "css selector", value="script[type='application/ld+json']" ) |> 
-  sapply(function(x){x$executeScript()})
+  sapply(function(x){x$executeScript("data-react-helmet")})
 
 # Load the necessary libraries
 library(jsonlite)
