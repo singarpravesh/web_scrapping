@@ -30,6 +30,7 @@ urls <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |>
 
 price <- c()
 bhk <- c()
+coordinates <- list()
 
 for (i in 1:2){
   rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
@@ -40,7 +41,10 @@ for (i in 1:2){
   price[i] <- remDr$findElements(using = "xpath", "//*[@class='list_header_semiBold configurationCards__configurationCardsHeading']") |> 
     sapply(function(x){x$getElementText()[[1]]})
   
-  bhk[i] <- remDr$findElements(using = "script", "//*[@type='application/ld+json']") |> 
+  bhk[i] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis list_header_semiBold configurationCards__configurationCardsSubHeading']") |> 
+    sapply(function(x){x$getElementText()[[1]]})
+  
+  coordinates[i] <- remDr$findElements(using = "css selector", value="script[type='application/ld+json']" ) |> 
     sapply(function(x){x$getElementText()[[1]]})
 
   remDr$closeWindow()
@@ -59,18 +63,19 @@ remDr$getCurrentUrl()
 rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
 remDr <- rD[["client"]]
 remDr$navigate(urls[1])
-
+c <- remDr$findElements(using = "css selector", value="script[type='application/ld+json']" ) |> 
+  sapply(function(x){x$executeScript()})
 
 # Load the necessary libraries
 library(jsonlite)
 library(jsonld)
 
 # URL of the website
-url <- remDr$navigate(urls[1])
 
-
+script_tag <- remDr$findElement(using = "css selector", value = "script[type='application/ld+json']")
+script_tag$executeScript()
 # Send a GET request to the URL
-response <- GET(url)
+response <- GET(urls[1])
 
 # Parse the HTML content
 html <- content(response, "text")
