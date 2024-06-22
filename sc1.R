@@ -40,7 +40,7 @@ for (i in 1:2){
   price[i] <- remDr$findElements(using = "xpath", "//*[@class='list_header_semiBold configurationCards__configurationCardsHeading']") |> 
     sapply(function(x){x$getElementText()[[1]]})
   
-  bhk[i] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis list_header_semiBold configurationCards__configurationCardsSubHeading']") |> 
+  bhk[i] <- remDr$findElements(using = "script", "//*[@type='application/ld+json']") |> 
     sapply(function(x){x$getElementText()[[1]]})
 
   remDr$closeWindow()
@@ -55,7 +55,20 @@ remDr$getCurrentUrl()
 
 
 
+#################
+rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
+remDr <- rD[["client"]]
+remDr$navigate(urls[1])
 
+
+bhk[i] <- remDr$findElements(using = "script", "//*[@type='application/ld+json']") |> 
+  sapply(function(x){x$getElementText()[[1]]})
+
+
+
+
+
+#################
 
 
 
