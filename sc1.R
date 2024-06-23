@@ -3,6 +3,8 @@
 
 library(RSelenium)
 library(dplyr)
+library(rvest)
+library(jsonlite)
 
 # Method 1
 # Install chromedriver 
@@ -30,7 +32,7 @@ urls <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |>
 
 price <- c()
 bhk <- c()
-coordinates <- list()
+latitude <- c()
 
 for (i in 1:2){
   rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
@@ -45,14 +47,13 @@ for (i in 1:2){
     sapply(function(x){x$getElementText()[[1]]})
   
   # latitude
-  html <- read_html_live(urls[1])
+  html <- read_html_live(urls[i])
   json_ld_script <- html_nodes(html, "script[type='application/ld+json']")
   json_ld_data <- lapply(json_ld_script, function(x) {
     json_str <- html_text(x)
     fromJSON(json_str)
   })
-  
-  json_ld_data[[3]]$geo$latitude
+  latitude[i] <- json_ld_data[[3]]$geo$latitude
   
   remDr$closeWindow()
   }
@@ -72,8 +73,7 @@ remDr <- rD[["client"]]
 remDr$navigate(urls[1])
 
 
-library(rvest)
-library(jsonlite)
+
 
 # Fetch the webpage content
 url <- "https://example.com"
