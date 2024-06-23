@@ -47,7 +47,7 @@ for (i in 1:2){
     sapply(function(x){x$getElementText()[[1]]})
  
     # latitude
-  html <- read_html_live(urls[i])
+  html <- read_html_live(urls[1])
   json_ld_script <- html_elements(html, xpath = 'script[type="application/ld+json"]')
   json_ld_data <- lapply(json_ld_script, function(x) {
     json_str <- html_text(x)
@@ -57,7 +57,7 @@ for (i in 1:2){
   remove(html)
   remove(json_ld_script)
   remove(json_ld_data)
-  
+  html$session$close()
   remDr$closeWindow()
   }
 
