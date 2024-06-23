@@ -54,6 +54,9 @@ for (i in 1:2){
     fromJSON(json_str)
   })
   latitude[i] <- json_ld_data[[3]]$geo$latitude
+  remove(html)
+  remove(json_ld_script)
+  remove(json_ld_data)
   
   remDr$closeWindow()
   }
