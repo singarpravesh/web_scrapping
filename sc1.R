@@ -47,9 +47,7 @@ for (i in 1:2){
     sapply(function(x){x$getElementText()[[1]]})
   remDr$closeWindow()
   # latitude
-  rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
-  remDr <- rD[["client"]]
-  html <- remDr$navigate(urls[1])
+  html <- read_html_live(urls[1])
   json_ld_script <- html_nodes(html, "script[type='application/ld+json']")
   json_ld_data <- lapply(json_ld_script, function(x) {
     json_str <- html_text(x)
