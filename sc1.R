@@ -47,7 +47,7 @@ for (i in 1:2){
     sapply(function(x){x$getElementText()[[1]]})
   remDr$closeWindow()
   # latitude
-  html <- read_html_live(urls[1])
+  html <- read_html_live(urls[i])
   json_ld_script <- html_nodes(html, "script[type='application/ld+json']")
   json_ld_data <- lapply(json_ld_script, function(x) {
     json_str <- html_text(x)
@@ -106,7 +106,47 @@ latitude <- read_html_live(urls[1]) |>
   }) 
 
 
+#######################
 
+html <- read_html_live(urls[2])
+json_ld_script <- html_nodes(html, "script[type='application/ld+json']")
+json_ld_data <- lapply(json_ld_script, function(x) {
+  json_str <- html_text(x)
+  fromJSON(json_str)
+})
+latitude <- json_ld_data[[3]]$geo$latitude
+chrome$close()
+
+##############################
+library(rvest)
+library(chromote)
+
+# Create a new Chrome session
+chrome <- chromote::Chrome$new()
+
+# Use read_html_live() to fetch HTML content
+
+for (i in 1:2) {
+  html <- read_html_live(urls[i])
+  
+  # Interact with the fetched HTML content
+  json_ld_script <- html_nodes(html, "script[type='application/ld+json']")
+  json_ld_data <- lapply(json_ld_script, function(x) {
+    json_str <- html_text(x)
+    fromJSON(json_str)
+  })
+  latitude[i] <- json_ld_data[[3]]$geo$latitude
+  remove(html)
+  remove(json_ld_data)
+  remove(json_ld_script)
+}
+
+# Close the Chrome session
+chrome$close()
+
+
+
+################################
 remDr$findElement(using = "xpath", value = "//script[@type='application/ld+json']")$getElementText()
 remDr$findElements(using = "css", value="script[type='application/ld+json']")|> 
   sapply(function(x){x$getElementText()[[1]]}) |> 
