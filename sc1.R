@@ -48,7 +48,7 @@ for (i in 1:2){
   remDr$closeWindow()
   # latitude
   html <- read_html_live(urls[i])
-  json_ld_script <- html_nodes(html, "script[type='application/ld+json']")
+  json_ld_script <- html_nodes(html, 'script[type="application/ld+json"]')
   json_ld_data <- lapply(json_ld_script, function(x) {
     json_str <- html_text(x)
     fromJSON(json_str)
@@ -74,9 +74,18 @@ remDr$getCurrentUrl()
 rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
 remDr <- rD[["client"]]
 remDr$navigate(urls[1])
+# Find all script tags with type="application/ld+json"
+script_tags <- remDr$findElements(using = 'css selector', 'script[type="application/ld+json"]')
+remDr$
+# Extract the text content of each script tag
+json_data <- lapply(script_tags, function(tag) {
+  tag$getElementText()
+})
 
-
-
+# Parse the JSON data
+json_list <- lapply(json_data, function(x) {
+  jsonlite::fromJSON(x[[1]], simplifyVector = FALSE)
+})
 
 # Fetch the webpage content
 url <- "https://example.com"
@@ -127,7 +136,7 @@ chrome <- chromote::Chrome$new()
 # Use read_html_live() to fetch HTML content
 
 for (i in 1:2) {
-  html <- read_html_live(urls[i])
+  html <- read_html(urls[1])
   
   # Interact with the fetched HTML content
   json_ld_script <- html_nodes(html, "script[type='application/ld+json']")
