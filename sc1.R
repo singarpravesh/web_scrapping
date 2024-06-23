@@ -8,7 +8,7 @@ library(dplyr)
 # Install chromedriver 
 # Documentation at https://cran.r-project.org/web/packages/RSelenium/RSelenium.pdf page 16
 
-rD <- rsDriver(browser="firefox",chromever = NULL, port=9511L, verbose=F)
+rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
 remDr <- rD[["client"]]
 
 # Method 2
@@ -44,9 +44,16 @@ for (i in 1:2){
   bhk[i] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis list_header_semiBold configurationCards__configurationCardsSubHeading']") |> 
     sapply(function(x){x$getElementText()[[1]]})
   
-  coordinates[i] <- remDr$findElements(using = "css selector", value="script[type='application/ld+json']" ) |> 
-    sapply(function(x){x$getElementText()[[1]]})
-
+  # latitude
+  html <- read_html_live(urls[1])
+  json_ld_script <- html_nodes(html, "script[type='application/ld+json']")
+  json_ld_data <- lapply(json_ld_script, function(x) {
+    json_str <- html_text(x)
+    fromJSON(json_str)
+  })
+  
+  json_ld_data[[3]]$geo$latitude
+  
   remDr$closeWindow()
   }
 
@@ -63,8 +70,44 @@ remDr$getCurrentUrl()
 rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
 remDr <- rD[["client"]]
 remDr$navigate(urls[1])
-c <- remDr$findElements(using = "css selector", value="script[type='application/ld+json']" ) |> 
-  sapply(function(x){x$executeScript("data-react-helmet")})
+
+
+library(rvest)
+library(jsonlite)
+
+# Fetch the webpage content
+url <- "https://example.com"
+html <- read_html_live(urls[1])
+
+# Extract the JSON-LD script tag
+json_ld_script <- html_nodes(html, "script[type='application/ld+json']")
+
+# Parse the JSON-LD data
+json_ld_data <- lapply(json_ld_script, function(x) {
+  json_str <- html_text(x)
+  fromJSON(json_str)
+})
+
+json_ld_data[[3]]$geo$latitude
+
+# Access the parsed data
+print(json_ld_data[[1]]$headline)
+print(json_ld_data[[1]]$`@type`)
+print(json_ld_data[[1]]$alternativeHeadline)
+
+latitude <- read_html_live(urls[1]) |> 
+  html_nodes("script[type='application/ld+json']") |> 
+  lapply(.,function(x) {
+    json_str <- html_text(x)
+    fromJSON(json_str)
+  }) 
+
+
+
+remDr$findElement(using = "xpath", value = "//script[@type='application/ld+json']")$getElementText()
+remDr$findElements(using = "css", value="script[type='application/ld+json']")|> 
+  sapply(function(x){x$getElementText()[[1]]}) |> 
+  jsonlite::fromJSON()
 
 # Load the necessary libraries
 library(jsonlite)
