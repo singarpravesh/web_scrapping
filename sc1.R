@@ -120,7 +120,7 @@ chrome$close()
 ##############################
 library(rvest)
 library(chromote)
-
+latitude <- c()
 # Create a new Chrome session
 chrome <- chromote::Chrome$new()
 
