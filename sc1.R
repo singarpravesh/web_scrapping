@@ -29,7 +29,7 @@ remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page1")
 
 urls <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
   sapply(function(x){x$getElementAttribute("href")}[[1]])
-remDr$closeWindow()
+
 price <- c()
 bhk <- c()
 latitude <- c()
@@ -45,10 +45,10 @@ for (i in 1:2){
   
   bhk[i] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis list_header_semiBold configurationCards__configurationCardsSubHeading']") |> 
     sapply(function(x){x$getElementText()[[1]]})
-  remDr$closeWindow()
-  # latitude
+ 
+    # latitude
   html <- read_html_live(urls[i])
-  json_ld_script <- html_nodes(html, 'script[type="application/ld+json"]')
+  json_ld_script <- html_elements(html, xpath = 'script[type="application/ld+json"]')
   json_ld_data <- lapply(json_ld_script, function(x) {
     json_str <- html_text(x)
     fromJSON(json_str)
