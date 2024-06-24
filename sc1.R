@@ -31,7 +31,7 @@ Area_sqft <- c()
 for (i in 1:2){
   rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
-  remDr$navigate(urls[1])
+  remDr$navigate(urls[i])
   
   
   Price[i] <- remDr$findElements(using = "xpath", "//*[@class='list_header_semiBold configurationCards__configurationCardsHeading']") |> 
@@ -67,7 +67,7 @@ for (i in 1:2){
 
 house_data <- tibble(price = Price,
                      bhk = Bhk,
-                     price_sqft = Price_sqft,
+                     area_sqft = Area_sqft,
                      latitude = round(as.numeric(Latitude), 8),
                      longitude = round(as.numeric(Longitude), 8)) |> 
   tidyr::separate_wider_delim(cols = price, delim = "-",
