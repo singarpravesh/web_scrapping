@@ -25,13 +25,13 @@ Price <- c()
 Bhk <- c()
 Latitude <- c()
 Longitude <- c()
-Price_sqft <- c()
+Area_sqft <- c()
 
 # Scrap the data in page 1
 for (i in 1:2){
   rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
-  remDr$navigate(urls[i])
+  remDr$navigate(urls[1])
   
   
   Price[i] <- remDr$findElements(using = "xpath", "//*[@class='list_header_semiBold configurationCards__configurationCardsHeading']") |> 
@@ -40,7 +40,7 @@ for (i in 1:2){
   Bhk[i] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis list_header_semiBold configurationCards__configurationCardsSubHeading']") |> 
     sapply(function(x){x$getElementText()[[1]]})
  
-  Price_sqft[i] <- remDr$findElements(using = "xpath", '//*[@class="areaRate__avgPrice"]')
+  Area_sqft[i] <- remDr$findElements(using = "xpath", "//*[@class='caption_subdued_medium configurationCards__cardAreaSubHeadingOne']") |> 
     sapply(function(x){x$getElementText()[[1]]})
   
   html <- remDr$getPageSource()[[1]]
@@ -67,6 +67,7 @@ for (i in 1:2){
 
 house_data <- tibble(price = Price,
                      bhk = Bhk,
+                     price_sqft = Price_sqft,
                      latitude = round(as.numeric(Latitude), 8),
                      longitude = round(as.numeric(Longitude), 8)) |> 
   tidyr::separate_wider_delim(cols = price, delim = "-",
