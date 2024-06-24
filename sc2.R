@@ -9,6 +9,7 @@ urls
 
 
 latitude <- c()
+longitude <- c()
 
 for (i in 1:2){
   rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
@@ -24,7 +25,7 @@ for (i in 1:2){
   })
   
   latitude[i] <- json_ld_data[[3]]$geo$latitude
-
+  longitude[i] <- json_ld_data[[3]]$geo$longitude
   remDr$closeWindow()
 
   remove(html)
