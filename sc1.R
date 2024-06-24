@@ -1,50 +1,42 @@
-# install.packages("RSelenium")
-# install.packages("dplyr")
+# Required packages
 
 library(RSelenium)
 library(dplyr)
 library(rvest)
 library(jsonlite)
+library(readr)
 
-# Method 1
-# Install chromedriver 
-# Documentation at https://cran.r-project.org/web/packages/RSelenium/RSelenium.pdf page 16
-
+##########################################################################
+# Activate firefox
 rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
 remDr <- rD[["client"]]
 
-# Method 2
-# Run the following from terminal. Docker required.
-# docker pull selenium/standalone-firefox
-# docker run -d -p 4445:4444 selenium/standalone-firefox
-# Run 
-# remDr <- remoteDriver(
-#   remoteServerAddr = "localhost",
-#   port = 4445L,
-#   browserName = "firefox"
-# )
-# remDr$open()
-
+# navigate to page 1
 remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page1")
 
+# Get all the urls in page 1
 urls <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
   sapply(function(x){x$getElementAttribute("href")}[[1]])
 
-price <- c()
-bhk <- c()
-latitude <- c()
-longitude <- c()
+############################################################################
 
-for (i in 1:2){
+# Initalise the variables
+Price <- c()
+Bhk <- c()
+Latitude <- c()
+Longitude <- c()
+
+# Scrap the data in page 1
+for (i in 1:length(urls)){
   rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
   remDr$navigate(urls[i])
   
   
-  price[i] <- remDr$findElements(using = "xpath", "//*[@class='list_header_semiBold configurationCards__configurationCardsHeading']") |> 
+  Price[i] <- remDr$findElements(using = "xpath", "//*[@class='list_header_semiBold configurationCards__configurationCardsHeading']") |> 
     sapply(function(x){x$getElementText()[[1]]})
   
-  bhk[i] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis list_header_semiBold configurationCards__configurationCardsSubHeading']") |> 
+  Bhk[i] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis list_header_semiBold configurationCards__configurationCardsSubHeading']") |> 
     sapply(function(x){x$getElementText()[[1]]})
  
   html <- remDr$getPageSource()[[1]]
@@ -55,10 +47,10 @@ for (i in 1:2){
     fromJSON(json_str)
   })
   
-  latitude[i] <- json_ld_data[[3]]$geo$latitude
-  longitude[i] <- json_ld_data[[3]]$geo$longitude
+  Latitude[i] <- json_ld_data[[3]]$geo$latitude
+  Longitude[i] <- json_ld_data[[3]]$geo$longitude
  
-   remDr$closeWindow()
+  remDr$closeWindow()
   
   remove(html)
   remove(json_ld_data)
@@ -67,4 +59,11 @@ for (i in 1:2){
   remove(remDr)
   }
 
+# Data frame
 
+house_data <- tibble(price = Price,
+                     bhk = Bhk,
+                     latitude = round(as.numeric(Latitude), 8),
+                     longitude = round(as.numeric(Longitude), 8)) |> 
+  tidyr::separate_wider_delim(cols = price, delim = "-",
+                                             names = c("price_min", "price_max"))
