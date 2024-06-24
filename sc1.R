@@ -25,9 +25,10 @@ Price <- c()
 Bhk <- c()
 Latitude <- c()
 Longitude <- c()
+Price_sqft <- c()
 
 # Scrap the data in page 1
-for (i in 1:length(urls)){
+for (i in 1:2){
   rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
   remDr$navigate(urls[i])
@@ -39,6 +40,9 @@ for (i in 1:length(urls)){
   Bhk[i] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis list_header_semiBold configurationCards__configurationCardsSubHeading']") |> 
     sapply(function(x){x$getElementText()[[1]]})
  
+  Price_sqft[i] <- remDr$findElements(using = "xpath", '//*[@class="areaRate__avgPrice"]')
+    sapply(function(x){x$getElementText()[[1]]})
+  
   html <- remDr$getPageSource()[[1]]
   json_ld_script <- read_html(html) |> 
     html_nodes('script[type="application/ld+json"]')
