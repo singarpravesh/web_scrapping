@@ -1,3 +1,7 @@
+# JAVA environmental variables setup
+# https://azimuahamed.medium.com/java-environment-variables-setup-windows-11-58fe71e43b5e
+# Restaring the PC is required
+
 # Required packages
 
 library(RSelenium)
@@ -22,10 +26,23 @@ urls <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |>
 
 # Initalise the variables
 Price <- c()
-Bhk <- c()
+
+# Structural variables 
+Bhk <- c() # No of rooms (1,2,3,4)
+Parking <- c() # Has a car parking (0/1)
+Area_sqft <- c() 
+
+# Locational variables
 Latitude <- c()
 Longitude <- c()
-Area_sqft <- c()
+Shopping_mall <- c() # distance to nearest supermarket in meters
+School <- c() # distance to nearest school
+Railway_station <- c() # distance to nearest railway station
+Hospital <- c() # distance to nearest hospital
+Bus_stop <- c() # distance to nearest bus stop
+Metro_station <- c() 
+
+
 
 # Scrap the data in page 1
 for (i in 1:2){

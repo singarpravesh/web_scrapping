@@ -8,13 +8,12 @@ urls
 # latitude
 
 
-latitude <- c()
-longitude <- c()
+Facilities <- c()
 
 for (i in 1:2){
   rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
-  remDr$navigate(urls[i])
+  remDr$navigate(urls[1])
 
   html <- remDr$getPageSource()[[1]]
   json_ld_script <- read_html(html) |> 
