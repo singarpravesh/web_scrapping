@@ -29,27 +29,22 @@ Price <- c()
 
 # Structural variables 
 Bhk <- c() # No of rooms (1,2,3,4)
-Parking <- c() # Has a car parking (0/1)
-Area_sqft <- c() 
+Area_sqft <- list() 
 
 # Locational variables
 Latitude <- c()
 Longitude <- c()
-Shopping_mall <- c() # distance to nearest supermarket in meters
-School <- c() # distance to nearest school
-Railway_station <- c() # distance to nearest railway station
-Hospital <- c() # distance to nearest hospital
-Bus_stop <- c() # distance to nearest bus stop
-Metro_station <- c() 
+Top_facilities <- list()
+Other_facilities <- list()
 
 
-
-# Scrap the data in page 1
+# Scrape the data in page 1
 for (i in 1:2){
   rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
   remDr$navigate(urls[i])
   
+  remDr$findElement(using = "css", value = ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")$clickElement()
   
   Price[i] <- remDr$findElements(using = "xpath", "//*[@class='list_header_semiBold configurationCards__configurationCardsHeading']") |> 
     sapply(function(x){x$getElementText()[[1]]})
@@ -71,6 +66,19 @@ for (i in 1:2){
   Latitude[i] <- json_ld_data[[3]]$geo$latitude
   Longitude[i] <- json_ld_data[[3]]$geo$longitude
  
+  Top_facilities[i] <- read_html(html) |> 
+    html_nodes('div[class="UniquesFacilities__xidFacilitiesCard"]') %>% 
+    html_text() %>% list()
+  
+  remDr$executeScript("window.scrollTo(0,1400);")
+  remDr$setTimeout(type = "implicit", milliseconds = 2000)
+  remDr$findElement(using = "css", value = ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")$clickElement()
+  html_page <- remDr$getPageSource()[[1]]
+  Other_facilities[i] <- read_html(html_page) |> 
+    html_nodes('div[class="body_med"]') %>% 
+    html_text() %>% list()
+  
+  
   remDr$closeWindow()
   
   remove(html)
@@ -78,6 +86,7 @@ for (i in 1:2){
   remove(json_ld_script)
   remove(rD)
   remove(remDr)
+  remove(html_page)
   }
 
 # Data frame
@@ -85,6 +94,8 @@ for (i in 1:2){
 house_data <- tibble(price = Price,
                      bhk = Bhk,
                      area_sqft = Area_sqft,
+                     top_facilities = Top_facilities,
+                     other_facilities = Other_facilities,
                      latitude = round(as.numeric(Latitude), 8),
                      longitude = round(as.numeric(Longitude), 8)) |> 
   tidyr::separate_wider_delim(cols = price, delim = "-",
