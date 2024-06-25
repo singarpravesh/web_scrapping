@@ -12,7 +12,9 @@ library(readr)
 
 ##########################################################################
 # Activate firefox
-for (j in 2:100){
+
+urls2 <- list()
+for (j in 2:4){
   rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
   
@@ -23,6 +25,7 @@ for (j in 2:100){
   urls2[j] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
     sapply(function(x){x$getElementAttribute("href")}[[1]]) %>% 
     list()
+  remDr$closeWindow()
 }
 ############################################################################
 
@@ -43,7 +46,7 @@ Distance_to_locational_advantage <- list()
 
 # Scrape the data in page 1
 
-for (i in 1:length(urls)){
+for (i in 1:length(unlist(urls2))){
   rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
   remDr$navigate(urls[i])
@@ -82,7 +85,7 @@ for (i in 1:length(urls)){
   
   # Other facilities
   remDr$executeScript("window.scrollTo(0,1400);") # Need to scroll to the specific section
-  remDr$setTimeout(type = "implicit", milliseconds = 5000) # Need to wait to load the page in the remote driver
+  remDr$setTimeout(type = "implicit", milliseconds = 10000) # Need to wait to load the page in the remote driver
   remDr$findElement(using = "css", value = ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")$clickElement() # Click on the View all button
   html_page <- remDr$getPageSource()[[1]] # get the html content of the pop up page after click
   Other_facilities[i] <- read_html(html_page) |> 
@@ -91,7 +94,7 @@ for (i in 1:length(urls)){
   
   # Locational advantages (do the same as for 'other failities' above)
   remDr$executeScript("window.scrollTo(0,1700);")
-  remDr$setTimeout(type = "implicit", milliseconds = 2000)
+  remDr$setTimeout(type = "implicit", milliseconds = 10000)
   remDr$findElement(using = "css", value = ".OrderComponent__leftSection > div:nth-child(5) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > a:nth-child(2)")$clickElement()
   html_page <- remDr$getPageSource()[[1]]
   Locational_advantages[i] <- read_html(html_page) |> 
