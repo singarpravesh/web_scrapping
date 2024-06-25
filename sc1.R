@@ -78,6 +78,17 @@ for (i in 1:2){
     html_nodes('div[class="body_med"]') %>% 
     html_text() %>% list()
   
+  remDr$executeScript("window.scrollTo(0,1700);")
+  remDr$setTimeout(type = "implicit", milliseconds = 2000)
+  remDr$findElement(using = "css", value = ".OrderComponent__leftSection > div:nth-child(5) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > a:nth-child(2)")$clickElement()
+  html_page <- remDr$getPageSource()[[1]]
+  Locational_advantages[i] <- read_html(html_page) |> 
+    html_nodes('div[class="list_header_semiBold spacer2 ellipsis"]') %>% 
+    html_text() %>% list()
+  
+  Distance_to_locational_advantage[i] <- read_html(html_page) |> 
+    html_nodes('div[class="caption_subdued_medium ellipsis"]') %>% 
+    html_text() %>% list()
   
   remDr$closeWindow()
   
