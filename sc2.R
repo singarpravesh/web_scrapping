@@ -22,7 +22,8 @@ for (i in 1:2){
     html_nodes('div[class="UniquesFacilities__xidFacilitiesCard"]') %>% 
     html_text()
   
-  remDr$findElement(using = "css", value = ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")$clickElement()
+  remDr$findElement(using = "css", value = ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")$clickElement() %>% 
+    remDr$findElement(using = "css", value = ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")$clickElement()
                        
   html_page <- remDr$getPageSource()[[1]]
   Other_facilities[i] <- read_html(html_page) |> 
@@ -31,6 +32,7 @@ for (i in 1:2){
   
   
   remDr$closeWindow()
+  
   remove(html_page_main)
   remove(html_page)
   remove(rD)
