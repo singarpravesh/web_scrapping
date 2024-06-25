@@ -12,16 +12,18 @@ library(readr)
 
 ##########################################################################
 # Activate firefox
-rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
-remDr <- rD[["client"]]
-
-# navigate to page 1
-remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page1")
-
-# Get all the urls in page 1
-urls <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
-  sapply(function(x){x$getElementAttribute("href")}[[1]])
-
+for (j in 2:100){
+  rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
+  remDr <- rD[["client"]]
+  
+  # navigate to page j
+  remDr$navigate(paste0("https://www.99acres.com/property-in-kolkata-ffid-page", j))
+  
+  # Get all the urls in page j
+  urls2[j] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
+    sapply(function(x){x$getElementAttribute("href")}[[1]]) %>% 
+    list()
+}
 ############################################################################
 
 # Initalise the variables
@@ -56,7 +58,7 @@ for (i in 1:length(urls)){
   # BHK data
   Bhk[i] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis list_header_semiBold configurationCards__configurationCardsSubHeading']") |> 
     sapply(function(x){x$getElementText()[[1]]})
- 
+  
   # Area data
   Area_sqft[i] <- remDr$findElements(using = "xpath", "//*[@class='caption_subdued_medium configurationCards__cardAreaSubHeadingOne']") |> 
     sapply(function(x){x$getElementText()[[1]]}) %>% 
@@ -72,7 +74,7 @@ for (i in 1:length(urls)){
   })
   Latitude[i] <- json_ld_data[[3]]$geo$latitude
   Longitude[i] <- json_ld_data[[3]]$geo$longitude
- 
+  
   # Top facilities
   Top_facilities[i] <- read_html(html) |> 
     html_nodes('div[class="UniquesFacilities__xidFacilitiesCard"]') %>% 
@@ -111,7 +113,7 @@ for (i in 1:length(urls)){
   remove(rD)
   remove(remDr)
   remove(html_page)
-  }
+}
 
 # Data frame
 
@@ -125,4 +127,4 @@ house_data <- tibble(price = Price,
                      latitude = round(as.numeric(Latitude), 8),
                      longitude = round(as.numeric(Longitude), 8)) |> 
   tidyr::separate_wider_delim(cols = price, delim = "-",
-                                             names = c("price_min", "price_max"))
+                              names = c("price_min", "price_max"))
