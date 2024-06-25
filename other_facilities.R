@@ -13,16 +13,12 @@ Other_facilities <- list()
 for (i in 1:2){
   rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
-  remDr$navigate(urls[1])
+  remDr$navigate(urls[i])
   
   remDr$findElement(using = "css", value = ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")$clickElement()
-  remDr$buttondown()
-  
-  remDr$executeScript("window.scrollTo(0,document.body.scrollHeight);")
-  
-  remDr$findElement(using = "id", value = "#selectedTab")$clickElement()
-  
-  remDr$findElement(using = "css", value = ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")$clickElement()
+
+  remDr$executeScript("window.scrollTo(0,1400);")
+  remDr$setTimeout(type = "implicit", milliseconds = 2000)
   remDr$findElement(using = "css", value = ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")$clickElement()
   html_page <- remDr$getPageSource()[[1]]
   Other_facilities[i] <- read_html(html_page) |> 
