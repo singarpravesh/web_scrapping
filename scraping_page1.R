@@ -40,8 +40,8 @@ Locational_advantages <- list()
 Distance_to_locational_advantage <- list()
 
 # Scrape the data in page 1
-
-for (i in 1:length(urls)){
+tic("Time")
+for (i in 1:2){
   rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
   remDr$navigate(urls[i])
@@ -113,6 +113,7 @@ for (i in 1:length(urls)){
   remove(html_page)
   }
 
+toc()
 # Data frame
 
 house_data <- tibble(price = Price,
