@@ -41,10 +41,13 @@ Distance_to_locational_advantage <- list()
 
 # Scrape the data in page 1
 tic("Time")
+
+rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
+remDr <- rD[["client"]]
+remDr$navigate(urls[1])
+
 for (i in 1:2){
-  rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
-  remDr <- rD[["client"]]
-  remDr$navigate(urls[i])
+  
   
   # Click the ok button
   remDr$findElement(using = "css", value = ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")$clickElement()
@@ -80,7 +83,7 @@ for (i in 1:2){
   
   # Other facilities
   remDr$executeScript("window.scrollTo(0,1400);") # Need to scroll to the specific section
-  remDr$setTimeout(type = "implicit", milliseconds = 5000) # Need to wait to load the page in the remote driver
+  remDr$setTimeout(type = "implicit", milliseconds = 10000) # Need to wait to load the page in the remote driver
   remDr$findElement(using = "css", value = ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")$clickElement() # Click on the View all button
   html_page <- remDr$getPageSource()[[1]] # get the html content of the pop up page after click
   Other_facilities[i] <- read_html(html_page) |> 
@@ -89,7 +92,7 @@ for (i in 1:2){
   
   # Locational advantages (do the same as for 'other failities' above)
   remDr$executeScript("window.scrollTo(0,1700);")
-  remDr$setTimeout(type = "implicit", milliseconds = 2000)
+  remDr$setTimeout(type = "implicit", milliseconds = 10000)
   remDr$findElement(using = "css", value = ".OrderComponent__leftSection > div:nth-child(5) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > a:nth-child(2)")$clickElement()
   html_page <- remDr$getPageSource()[[1]]
   Locational_advantages[i] <- read_html(html_page) |> 
@@ -102,7 +105,7 @@ for (i in 1:2){
     html_text() %>% list()
   
   # Close the remote firefox window
-  remDr$closeWindow()
+  remDr$navigate(urls[i+1])
   
   # Remove the objects that can clutter the environment
   remove(html)
