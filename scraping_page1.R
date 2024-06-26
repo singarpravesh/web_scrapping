@@ -40,18 +40,21 @@ Locational_advantages <- list()
 Distance_to_locational_advantage <- list()
 
 # Scrape the data in page 1
+
+rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
+remDr <- rD[["client"]]
+remDr$navigate(urls[1])
+
 tic("Time")
 
 
-for (i in 1:length(urls)){
+for (i in 1:2){
   
   # Navigate
-  rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
-  remDr <- rD[["client"]]
-  remDr$navigate(urls[i])
+
   
   # Click the ok button
-  remDr$findElement(using = "css", value = ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")$clickElement()
+  # remDr$findElement(using = "css", value = ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")$clickElement()
   
   # Data for price
   Price[i] <- remDr$findElements(using = "xpath", "//*[@class='list_header_semiBold configurationCards__configurationCardsHeading']") |> 
@@ -105,14 +108,14 @@ for (i in 1:length(urls)){
     html_nodes('div[class="caption_subdued_medium ellipsis"]') %>% 
     html_text() %>% list()
   
-
-  remDr$closeWindow()
+  remDr$executeScript(sprintf("window.open('%s');", urls[i+1]))
+  
+  Sys.sleep(10)
+  
   # Remove the objects that can clutter the environment
   remove(html)
   remove(json_ld_data)
   remove(json_ld_script)
-  remove(remDr)
-  remove(rD)
   remove(html_page)
   }
 
