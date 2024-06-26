@@ -9,7 +9,7 @@ library(dplyr)
 library(rvest)
 library(jsonlite)
 library(readr)
-
+library(tictoc)
 ##########################################################################
 # Activate firefox
 rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
@@ -42,15 +42,14 @@ Distance_to_locational_advantage <- list()
 # Scrape the data in page 1
 tic("Time")
 
-rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
-remDr <- rD[["client"]]
-remDr$navigate(urls[1])
 
-for (i in 1:2){
+for (i in 1:length(urls)){
   
   # Navigate
+  rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
-  remDr$navigate(urls[i+1])
+  remDr$navigate(urls[i])
+  
   # Click the ok button
   remDr$findElement(using = "css", value = ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")$clickElement()
   
@@ -107,12 +106,13 @@ for (i in 1:2){
     html_text() %>% list()
   
 
-  
+  remDr$closeWindow()
   # Remove the objects that can clutter the environment
   remove(html)
   remove(json_ld_data)
   remove(json_ld_script)
   remove(remDr)
+  remove(rD)
   remove(html_page)
   }
 
