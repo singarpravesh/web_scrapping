@@ -48,7 +48,9 @@ remDr$navigate(urls[1])
 
 for (i in 1:2){
   
-  
+  # Navigate
+  remDr <- rD[["client"]]
+  remDr$navigate(urls[i+1])
   # Click the ok button
   remDr$findElement(using = "css", value = ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")$clickElement()
   
@@ -104,14 +106,12 @@ for (i in 1:2){
     html_nodes('div[class="caption_subdued_medium ellipsis"]') %>% 
     html_text() %>% list()
   
-  # Close the remote firefox window
-  remDr$navigate(urls[i+1])
+
   
   # Remove the objects that can clutter the environment
   remove(html)
   remove(json_ld_data)
   remove(json_ld_script)
-  remove(rD)
   remove(remDr)
   remove(html_page)
   }
