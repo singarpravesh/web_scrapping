@@ -86,7 +86,13 @@ for (i in 1:length(urls)){
     html_text() %>% list()
   
   # Other facilities
-  remDr$executeScript("window.scrollTo(0,1400);") # Need to scroll to the specific section
+  # remDr$executeScript("window.scrollTo(0,1400);") # Need to scroll to the specific section
+  # Find the element you want to scroll to
+  elem <- remDr$findElement(using = 'css', value = '#UniquesFacilities__pageHeadingWrapper')
+  
+  # Scroll to the element using JavaScript
+  remDr$executeScript(sprintf("arguments[0].scrollIntoView(%s);", "true"), elem)
+  
   remDr$setTimeout(type = "implicit", milliseconds = 10000) # Need to wait to load the page in the remote driver
   remDr$findElement(using = "css", value = ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")$clickElement() # Click on the View all button
   html_page <- remDr$getPageSource()[[1]] # get the html content of the pop up page after click
