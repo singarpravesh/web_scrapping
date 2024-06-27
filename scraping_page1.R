@@ -45,12 +45,12 @@ Distance_to_locational_advantage <- list()
 tic("Time")
 
 
-for (i in 1:length(urls)){
+for (i in 5:10){
   
   # Navigate
   rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
-  remDr$navigate(urls[i])
+  remDr$navigate(urls[9])
   
   # Click the ok button
   remDr$findElement(using = "css", value = ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")$clickElement()
@@ -94,6 +94,7 @@ for (i in 1:length(urls)){
   # remDr$executeScript(sprintf("arguments[0].scrollIntoView(%s);", "true"), elem)
   
   remDr$setTimeout(type = "implicit", milliseconds = 10000) # Need to wait to load the page in the remote driver
+  tryCatch({
   remDr$findElement(using = "css", value = ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")$clickElement() # Click on the View all button
   html_page <- remDr$getPageSource()[[1]] # get the html content of the pop up page after click
   Other_facilities[i] <- read_html(html_page) |> 
@@ -113,6 +114,15 @@ for (i in 1:length(urls)){
   Distance_to_locational_advantage[i] <- read_html(html_page) |> 
     html_nodes('div[class="caption_subdued_medium ellipsis"]') %>% 
     html_text() %>% list()
+    },error = function(e) {
+    if (inherits(e, "NoSuchElementException")) {
+      # Specific handling for the NoSuchElement exception
+      message("Element not found, skipping this step.")
+    } else {
+      # General error handling for other types of exceptions
+      message("An error occurred: ", e$message)}
+    }
+      )
   
   remDr$closeWindow()
   rD$server$stop()
