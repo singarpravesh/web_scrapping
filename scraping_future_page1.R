@@ -12,25 +12,25 @@ plan(multisession)
 urls
 
 # Initialize vectors/lists to store the results
-Price <- vector("list", length(urls))
-Bhk <- vector("list", length(urls))
-Area_sqft <- vector("list", length(urls))
-Latitude <- vector("numeric", length(urls))
-Longitude <- vector("numeric", length(urls))
-Top_facilities <- vector("list", length(urls))
-Other_facilities <- vector("list", length(urls))
-Locational_advantages <- vector("list", length(urls))
-Distance_to_locational_advantage <- vector("list", length(urls))
+Price <- vector("list", length(urls[-c(9,23)]))
+Bhk <- vector("list", length(urls[-c(9,23)]))
+Area_sqft <- vector("list", length(urls[-c(9,23)]))
+Latitude <- vector("numeric", length(urls[-c(9,23)]))
+Longitude <- vector("numeric", length(urls[-c(9,23)]))
+Top_facilities <- vector("list", length(urls[-c(9,23)]))
+Other_facilities <- vector("list", length(urls[-c(9,23)]))
+Locational_advantages <- vector("list", length(urls[-c(9,23)]))
+Distance_to_locational_advantage <- vector("list", length(urls[-c(9,23)]))
 
 # List to store futures
 futures <- list()
 
 tic("Time")
-for (i in 1:length(urls)) {
+for (i in 1:length(urls[-c(9,23)])) {
   futures[[i]] <- future({
-    rD <- rsDriver(browser = "firefox", chromever = NULL, port = netstat::free_port(), verbose = F)
+    rD <- rsDriver(browser = "firefox", chromever = NULL, port = netstat::free_port(), verbose = F, check = F)
     remDr <- rD[["client"]]
-    remDr$navigate(urls[i])
+    remDr$navigate(urls[-c(9,23)][i])
     
     # Click the ok button
     remDr$findElement(using = "css", value = ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")$clickElement()

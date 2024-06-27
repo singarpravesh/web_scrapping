@@ -50,7 +50,7 @@ for (i in 1:length(urls)){
   # Navigate
   rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
-  remDr$navigate(urls[1])
+  remDr$navigate(urls[i])
   
   # Click the ok button
   remDr$findElement(using = "css", value = ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")$clickElement()
@@ -86,12 +86,12 @@ for (i in 1:length(urls)){
     html_text() %>% list()
   
   # Other facilities
-  remDr$executeScript("window.scrollTo(0,1700);") # Need to scroll to the specific section
+  remDr$executeScript("window.scrollTo(0,1600);") # Need to scroll to the specific section
   # Find the element you want to scroll to
   #elem <- remDr$findElement(using = 'css', value = '#UniquesFacilities__pageHeadingWrapper')
   
   # Scroll to the element using JavaScript
-  remDr$executeScript(sprintf("arguments[0].scrollIntoView(%s);", "true"), elem)
+  # remDr$executeScript(sprintf("arguments[0].scrollIntoView(%s);", "true"), elem)
   
   remDr$setTimeout(type = "implicit", milliseconds = 10000) # Need to wait to load the page in the remote driver
   remDr$findElement(using = "css", value = ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")$clickElement() # Click on the View all button
@@ -115,7 +115,7 @@ for (i in 1:length(urls)){
     html_text() %>% list()
   
   remDr$closeWindow()
-  
+  rD$server$stop()
   # Remove the objects that can clutter the environment
   remove(html)
   remove(json_ld_data)
@@ -123,6 +123,7 @@ for (i in 1:length(urls)){
   remove(html_page)
   remove(rD)
   remove(remDr)
+    gc()
   }
 
 toc()
