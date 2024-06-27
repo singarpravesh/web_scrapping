@@ -133,7 +133,7 @@ for (i in 5:10){
   remove(html_page)
   remove(rD)
   remove(remDr)
-    gc()
+  gc()
   }
 
 toc()
