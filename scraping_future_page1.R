@@ -30,7 +30,7 @@ for (i in 1:length(urls)) {
   futures[[i]] <- future({
     rD <- rsDriver(browser = "firefox", chromever = NULL, port = netstat::free_port(), verbose = F)
     remDr <- rD[["client"]]
-    remDr$navigate(urls[1])
+    remDr$navigate(urls[i])
     
     # Click the ok button
     remDr$findElement(using = "css", value = ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")$clickElement()
@@ -78,7 +78,7 @@ for (i in 1:length(urls)) {
       html_text() %>% list()
     
     # Locational advantages (do the same as for 'other failities' above)
-    remDr$executeScript("window.scrollTo(0,1700);")
+    remDr$executeScript("window.scrollTo(0,2100);")
     remDr$setTimeout(type = "implicit", milliseconds = 20000)
     remDr$findElement(using = "css", value = ".OrderComponent__leftSection > div:nth-child(5) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > a:nth-child(2)")$clickElement()
     html_page <- remDr$getPageSource()[[1]]

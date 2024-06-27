@@ -86,9 +86,9 @@ for (i in 1:length(urls)){
     html_text() %>% list()
   
   # Other facilities
-  # remDr$executeScript("window.scrollTo(0,1400);") # Need to scroll to the specific section
+  remDr$executeScript("window.scrollTo(0,1700);") # Need to scroll to the specific section
   # Find the element you want to scroll to
-  elem <- remDr$findElement(using = 'css', value = '#UniquesFacilities__pageHeadingWrapper')
+  #elem <- remDr$findElement(using = 'css', value = '#UniquesFacilities__pageHeadingWrapper')
   
   # Scroll to the element using JavaScript
   remDr$executeScript(sprintf("arguments[0].scrollIntoView(%s);", "true"), elem)
@@ -101,7 +101,7 @@ for (i in 1:length(urls)){
     html_text() %>% list()
   
   # Locational advantages (do the same as for 'other failities' above)
-  remDr$executeScript("window.scrollTo(0,1700);")
+  remDr$executeScript("window.scrollTo(0,2100);")
   remDr$setTimeout(type = "implicit", milliseconds = 10000)
   remDr$findElement(using = "css", value = ".OrderComponent__leftSection > div:nth-child(5) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > a:nth-child(2)")$clickElement()
   html_page <- remDr$getPageSource()[[1]]
