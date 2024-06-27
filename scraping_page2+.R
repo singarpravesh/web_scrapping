@@ -13,7 +13,7 @@ library(readr)
 ##########################################################################
 # Activate firefox
 
-urls2 <- list()
+urls_2_to_4 <- list()
 for (j in 2:4){
   rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
@@ -22,10 +22,11 @@ for (j in 2:4){
   remDr$navigate(paste0("https://www.99acres.com/property-in-kolkata-ffid-page", j))
   
   # Get all the urls in page j
-  urls2[j] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
+  urls_2_to_4[j] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
     sapply(function(x){x$getElementAttribute("href")}[[1]]) %>% 
     list()
   remDr$closeWindow()
+  rD$server$stop()
 }
 ############################################################################
 
@@ -46,88 +47,138 @@ Distance_to_locational_advantage <- list()
 
 # Scrape the data in page 1
 
-for (i in 1:length(unlist(urls2))){
+for (i in 1:length(unlist(urls_2_to_4))){
   rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
-  remDr$navigate(urls[i])
+  remDr$navigate(unlist(urls_2_to_4)[i])
   
-  # Click the ok button
-  remDr$findElement(using = "css", value = ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")$clickElement()
+  # Helper function to check if element exists
+  element_exists <- function(using, value) {
+    length(remDr$findElements(using = using, value = value)) > 0
+  }
+  
+  # Click the OK button if it exists
+  if (element_exists("css", ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")) {
+    remDr$findElement(using = "css", value = ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")$clickElement()
+  } else {
+    message("OK button not found or could not be clicked")
+  }
   
   # Data for price
-  Price[i] <- remDr$findElements(using = "xpath", "//*[@class='list_header_semiBold configurationCards__configurationCardsHeading']") |> 
-    sapply(function(x){x$getElementText()[[1]]})
+  if (element_exists("xpath", "//*[@class='list_header_semiBold configurationCards__configurationCardsHeading']")) {
+    Price[i] <- remDr$findElements(using = "xpath", "//*[@class='list_header_semiBold configurationCards__configurationCardsHeading']") |> 
+      sapply(function(x){x$getElementText()[[1]]})
+  } else {
+    Price[i] <- NA
+  }
   
   # BHK data
-  Bhk[i] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis list_header_semiBold configurationCards__configurationCardsSubHeading']") |> 
-    sapply(function(x){x$getElementText()[[1]]})
+  if (element_exists("xpath", "//*[@class='ellipsis list_header_semiBold configurationCards__configurationCardsSubHeading']")) {
+    Bhk[i] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis list_header_semiBold configurationCards__configurationCardsSubHeading']") |> 
+      sapply(function(x){x$getElementText()[[1]]})
+  } else {
+    Bhk[i] <- NA
+  }
   
   # Area data
-  Area_sqft[i] <- remDr$findElements(using = "xpath", "//*[@class='caption_subdued_medium configurationCards__cardAreaSubHeadingOne']") |> 
-    sapply(function(x){x$getElementText()[[1]]}) %>% 
-    list()
+  if (element_exists("xpath", "//*[@class='caption_subdued_medium configurationCards__cardAreaSubHeadingOne']")) {
+    Area_sqft[i] <- remDr$findElements(using = "xpath", "//*[@class='caption_subdued_medium configurationCards__cardAreaSubHeadingOne']") |> 
+      sapply(function(x){x$getElementText()[[1]]}) %>% 
+      list()
+  } else {
+    Area_sqft[i] <- NA
+  }
   
   # Coordinates of the property
-  html <- remDr$getPageSource()[[1]]
-  json_ld_script <- read_html(html) |> 
-    html_nodes('script[type="application/ld+json"]')
-  json_ld_data <- lapply(json_ld_script, function(x) {
-    json_str <- html_text(x)
-    fromJSON(json_str)
+  tryCatch({
+    html <- remDr$getPageSource()[[1]]
+    json_ld_script <- read_html(html) |> 
+      html_nodes('script[type="application/ld+json"]')
+    json_ld_data <- lapply(json_ld_script, function(x) {
+      json_str <- html_text(x)
+      fromJSON(json_str)
+    })
+    Latitude[i] <- json_ld_data[[3]]$geo$latitude
+    Longitude[i] <- json_ld_data[[3]]$geo$longitude
+  }, error = function(e) {
+    message("Coordinates not found: ", e$message)
   })
-  Latitude[i] <- json_ld_data[[3]]$geo$latitude
-  Longitude[i] <- json_ld_data[[3]]$geo$longitude
   
   # Top facilities
-  Top_facilities[i] <- read_html(html) |> 
-    html_nodes('div[class="UniquesFacilities__xidFacilitiesCard"]') %>% 
-    html_text() %>% list()
+  tryCatch({
+    Top_facilities[i] <- read_html(html) |> 
+      html_nodes('div[class="UniquesFacilities__xidFacilitiesCard"]') %>% 
+      html_text() %>% list()
+  }, error = function(e) {
+    message("Top facilities not found: ", e$message)
+  })
   
   # Other facilities
-  remDr$executeScript("window.scrollTo(0,1400);") # Need to scroll to the specific section
-  remDr$setTimeout(type = "implicit", milliseconds = 10000) # Need to wait to load the page in the remote driver
-  remDr$findElement(using = "css", value = ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")$clickElement() # Click on the View all button
-  html_page <- remDr$getPageSource()[[1]] # get the html content of the pop up page after click
-  Other_facilities[i] <- read_html(html_page) |> 
-    html_nodes('div[class="body_med"]') %>% 
-    html_text() %>% list()
+  tryCatch({
+    remDr$executeScript("window.scrollTo(0,1600);") # Scroll to the specific section
+    remDr$setTimeout(type = "implicit", milliseconds = 20000) # Wait to load the page
+    if (element_exists("css", ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")) {
+      remDr$findElement(using = "css", value = ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")$clickElement()
+      html_page <- remDr$getPageSource()[[1]] # Get the HTML content of the pop up page after click
+      
+      Other_facilities[i] <- read_html(html_page) |> 
+        html_nodes('div[class="body_med"]') %>% 
+        html_text() %>% list()
+    } else {
+      Other_facilities[i] <- NA
+    }
+  }, error = function(e) {
+    message("Other facilities not found: ", e$message)
+  })
   
-  # Locational advantages (do the same as for 'other failities' above)
-  remDr$executeScript("window.scrollTo(0,1700);")
-  remDr$setTimeout(type = "implicit", milliseconds = 10000)
-  remDr$findElement(using = "css", value = ".OrderComponent__leftSection > div:nth-child(5) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > a:nth-child(2)")$clickElement()
-  html_page <- remDr$getPageSource()[[1]]
-  Locational_advantages[i] <- read_html(html_page) |> 
-    html_nodes('div[class="list_header_semiBold spacer2 ellipsis"]') %>% 
-    html_text() %>% list()
+  # Locational advantages
+  tryCatch({
+    remDr$executeScript("window.scrollTo(0,2100);") # Scroll to the specific section
+    remDr$setTimeout(type = "implicit", milliseconds = 20000) # Wait to load the page
+    if (element_exists("css", ".OrderComponent__leftSection > div:nth-child(5) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > a:nth-child(2)")) {
+      remDr$findElement(using = "css", value = ".OrderComponent__leftSection > div:nth-child(5) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > a:nth-child(2)")$clickElement()
+      html_page <- remDr$getPageSource()[[1]]
+      
+      Locational_advantages[i] <- read_html(html_page) |> 
+        html_nodes('div[class="list_header_semiBold spacer2 ellipsis"]') %>% 
+        html_text() %>% list()
+    } else {
+      Locational_advantages[i] <- NA
+    }
+    
+    if (!is.na(Locational_advantages[i])){  
+      Distance_to_locational_advantage[i]<- read_html(html_page) |> 
+        html_nodes('div[class="caption_subdued_medium ellipsis"]') %>% 
+        html_text() %>% list()
+    } else {
+      Distance_to_locational_advantage[i] <- NA
+    }
+  }, error = function(e) {
+    message("Locational advantages not found: ", e$message)
+  })
   
-  # Distance to locational advantages as specified above. 
-  Distance_to_locational_advantage[i] <- read_html(html_page) |> 
-    html_nodes('div[class="caption_subdued_medium ellipsis"]') %>% 
-    html_text() %>% list()
-  
-  # Close the remote firefox window
   remDr$closeWindow()
+  rD$server$stop()
   
   # Remove the objects that can clutter the environment
   remove(html)
   remove(json_ld_data)
   remove(json_ld_script)
+  remove(html_page)
   remove(rD)
   remove(remDr)
-  remove(html_page)
+  gc()
 }
+toc()
 
-# Data frame
-
-house_data <- tibble(price = Price,
-                     bhk = Bhk,
-                     locational_advantages = Locational_advantages,
-                     distance_to_locational_advantage = Distance_to_locational_advantage,
-                     area_sqft = Area_sqft,
-                     top_facilities = Top_facilities,
-                     other_facilities = Other_facilities,
-                     latitude = round(as.numeric(Latitude), 8),
-                     longitude = round(as.numeric(Longitude), 8)) |> 
-  tidyr::separate_wider_delim(cols = price, delim = "-",
-                              names = c("price_min", "price_max"))
+housing_data_page1 <- tibble(
+  price = Price,
+  bhk = Bhk ,
+  area_sqft = Area_sqft,
+  latitude = Latitude ,
+  longitude = Longitude ,
+  top_facilities = Top_facilities,
+  other_facilities = Other_facilities,
+  locational_advantages = Locational_advantages,
+  distance_to_locational_advantage = Distance_to_locational_advantage 
+)

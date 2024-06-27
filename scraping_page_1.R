@@ -144,3 +144,15 @@ remove(remDr)
 gc()
 }
 toc()
+
+housing_data_page1 <- tibble(
+  price = Price,
+  bhk = Bhk ,
+  area_sqft = Area_sqft,
+  latitude = Latitude ,
+  longitude = Longitude ,
+  top_facilities = Top_facilities,
+  other_facilities = Other_facilities,
+  locational_advantages = Locational_advantages,
+  distance_to_locational_advantage = Distance_to_locational_advantage 
+)

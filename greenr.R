@@ -1,5 +1,5 @@
 # install.packages("remotes") # Uncomment if you do not have the 'remotes' package installed
-remotes::install_github("sachit27/greenR", dependencies = TRUE)
+# remotes::install_github("sachit27/greenR", dependencies = TRUE)
 library(greenR)
 
 data <- get_osm_data("Kolkata, India")
