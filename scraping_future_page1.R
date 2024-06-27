@@ -30,7 +30,7 @@ for (i in 1:length(urls)) {
   futures[[i]] <- future({
     rD <- rsDriver(browser = "firefox", chromever = NULL, port = netstat::free_port(), verbose = F)
     remDr <- rD[["client"]]
-    remDr$navigate(urls[i])
+    remDr$navigate(urls[1])
     
     # Click the ok button
     remDr$findElement(using = "css", value = ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")$clickElement()
@@ -65,7 +65,11 @@ for (i in 1:length(urls)) {
       html_text() %>% list()
     
     # Other facilities
-    remDr$executeScript("window.scrollTo(0,1400);") # Need to scroll to the specific section
+    remDr$executeScript("window.scrollTo(0,1700);") # Need to scroll to the specific section
+    # Scroll to the specific section
+    #elem <- remDr$findElement(using = 'css', value = '.UniquesFacilities__pageHeadingWrapper > h2:nth-child(1)')
+    #remDr$executeScript("arguments[0].scrollIntoView(true);", list(elem))
+    
     remDr$setTimeout(type = "implicit", milliseconds = 20000) # Need to wait to load the page in the remote driver
     remDr$findElement(using = "css", value = ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")$clickElement() # Click on the View all button
     html_page <- remDr$getPageSource()[[1]] # get the html content of the pop up page after click
