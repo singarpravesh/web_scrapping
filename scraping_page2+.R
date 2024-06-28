@@ -9,12 +9,13 @@ library(dplyr)
 library(rvest)
 library(jsonlite)
 library(readr)
+library(tictoc)
 
 #####urls2_3#####################################################################
 # Activate firefox
 
-urls2_3 <- list()
-for (j in 2:3){
+urls4_6 <- list()
+for (j in 4:6){
   rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
   
@@ -22,7 +23,7 @@ for (j in 2:3){
   remDr$navigate(paste0("https://www.99acres.com/property-in-kolkata-ffid-page", j))
   
   # Get all the urls in page j
-  urls2_3[j] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
+  urls4_6[j] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
     sapply(function(x){x$getElementAttribute("href")}[[1]]) %>% 
     list()
   remDr$closeWindow()
@@ -47,10 +48,10 @@ Distance_to_locational_advantage <- list()
 
 # Scrape the data in page 1
 
-for (i in 1:length(unlist(urls2_3))){
+for (i in 1:length(unlist(urls4_6))){
   rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
-  remDr$navigate(unlist(urls2_3)[i])
+  remDr$navigate(unlist(urls4_6)[i])
   
   # Helper function to check if element exists
   element_exists <- function(using, value) {
