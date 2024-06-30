@@ -3,6 +3,18 @@ library(rvest)
 library(jsonlite)
 library(dplyr)
 library(tictoc)
+
+# Activate firefox
+rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
+remDr <- rD[["client"]]
+
+# navigate to page 1
+remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page1")
+
+# Get all the urls in page 3
+urls1 <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
+  sapply(function(x){x$getElementAttribute("href")}[[1]])
+
 # Initalise the variables
 Price <- c()
 
@@ -19,13 +31,13 @@ Locational_advantages <- list()
 Distance_to_locational_advantage <- list()
 
 tic("Time")
-for (i in 1:length(urls)){
+for (i in 1:length(urls1)){
 # Initialize RSelenium
 rD <- rsDriver(browser="firefox", chromever = NULL, port=netstat::free_port(), verbose=F)
 remDr <- rD[["client"]]
 
 # Navigate to the URL
-remDr$navigate(urls[i])
+remDr$navigate(urls1[i])
 
 # Helper function to check if element exists
 element_exists <- function(using, value) {

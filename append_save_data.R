@@ -1,6 +1,8 @@
 library(tidyverse)
 housing_data <- rows_append(housing_data_page1,
-                            housing_data2_3)
+                            housing_data_page2) |> 
+  rows_append(housing_data_page3) |> 
+  rows_append(housin)
 
 
 housing_data |> 
