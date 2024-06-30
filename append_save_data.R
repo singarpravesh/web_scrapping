@@ -2,7 +2,10 @@ library(tidyverse)
 housing_data <- rows_append(housing_data_page1,
                             housing_data_page2) |> 
   rows_append(housing_data_page3) |> 
-  rows_append(housin)
+  rows_append(housing_data_page4) |> 
+  rows_append(housing_data_page5) |> 
+  rows_append(housing_data_page6) |> 
+  rows_append(housing_data_page7)
 
 
 housing_data |> 

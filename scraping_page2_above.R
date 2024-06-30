@@ -893,7 +893,7 @@ remDr <- rD[["client"]]
 remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page-7")
 
 # Get all the urls in page 4
-urls6 <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
+urls7 <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
   sapply(function(x){x$getElementAttribute("href")}[[1]])
 remDr$closeWindow()
 rD$server$stop()
