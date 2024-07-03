@@ -8,6 +8,13 @@ library(sf)
 library(tidyverse)
 library(leaflet)
 
+
+# 1. enlarge the bounding box to include districts beyond Kolkata and the same one that you get 
+#    for 99acres.com
+# 2. Query OSM for green spaces with the bounding box in 1.
+# 3. Extract the relevant data.
+
+
 # Define the bounding box for Kolkata
 bbox <- getbb("Kolkata, India")
 
@@ -42,8 +49,9 @@ library(geosphere)
 # Example coordinates (longitude, latitude)
 
 
-house_coordinates <- st_as_sf(house, coords = c("longitude", "latitude"), crs = 4326) |> select(geometry) |> 
-  slice(1)
+house_data_sf <- housing_data %>% 
+  na.omit() %>% 
+  st_as_sf(coords = c("longitude", "latitude"), crs = 'WGS84') 
 
 park_coordinates <- (parks) |> select(geometry) |> 
   slice(2) |> st_centroid() # Coordinates for the park
