@@ -4,6 +4,7 @@ library(greenR)
 library(leaflet)
 
 data <- get_osm_data("Kolkata, India")
+
 green_areas_data <- data$green_areas
 
 green_areas_data$osm_polygons 
@@ -38,6 +39,10 @@ trees_data$osm_points %>%
 
 
 
+kolkata_boundary <- opq("Kolkata, India") %>%
+  add_osm_feature(key = "boundary", value = "administrative") %>%
+  osmdata_sf()
+kolkata_boundary <- kolkata_boundary$osm_multipolygons %>% filter(name == "Kolkata")
 # overlay housing data and green spaces data
 leaflet() %>%
   addTiles() %>%
@@ -48,11 +53,14 @@ leaflet() %>%
     popup = paste("Price:", housing_data$price, "<br>",
                   "Size:", housing_data$area_sqft, "<br>",
                   "Bedrooms:", housing_data$bhk),
+    popupOptions = "interactive",
     radius = 5,
     color = "red",
     fillOpacity = 0.5
   ) %>% 
-  addPolygons(data = green_areas_data$osm_polygons, fillColor = "green", fillOpacity = 0.7, color = "black", 
-              weight = 1, group = "Green Spaces")
+    addPolygons(data = green_areas_data$osm_polygons, fillColor = "green", fillOpacity = 0.7, color = "black", 
+              weight = 1, group = "Green Spaces") %>% 
+  addPolygons(data = kolkata_boundary$geometry, fill = "yellow")
+  
 
 

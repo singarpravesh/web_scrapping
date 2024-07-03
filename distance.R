@@ -1,7 +1,4 @@
-install.packages("osmdata")
-install.packages("sf")
-install.packages("tidyverse")
-install.packages("leaflet")
+
 
 library(osmdata)
 library(sf)
