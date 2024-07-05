@@ -100,8 +100,8 @@ for (i in 1:length(urls16)){
   
   # Other facilities
   tryCatch({
-    remDr$executeScript("window.scrollTo(0,1600);") # Scroll to the specific section
-    remDr$setTimeout(type = "implicit", milliseconds = 20000) # Wait to load the page
+    remDr$executeScript("window.scrollTo(0,1700);") # Scroll to the specific section
+    remDr$setTimeout(type = "implicit", milliseconds = 21000) # Wait to load the page
     if (element_exists("css", ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")) {
       remDr$findElement(using = "css", value = ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")$clickElement()
       html_page <- remDr$getPageSource()[[1]] # Get the HTML content of the pop up page after click
