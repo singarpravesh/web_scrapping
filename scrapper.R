@@ -5,10 +5,10 @@ rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), ve
 remDr <- rD[["client"]]
 
 # navigate to page 6
-remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page-16")
+remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page-23")
 
 # Get all the urls in page 4
-urls16 <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
+urls23 <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
   sapply(function(x){x$getElementAttribute("href")}[[1]])
 remDr$closeWindow()
 rD$server$stop()
@@ -29,13 +29,13 @@ Locational_advantages <- list()
 Distance_to_locational_advantage <- list()
 
 tic("Time")
-for (i in 1:length(urls16)){
+for (i in 1:length(urls23)){
   # Initialize RSelenium
   rD <- rsDriver(browser="firefox", chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
   
   # Navigate to the URL
-  remDr$navigate(urls16[i])
+  remDr$navigate(urls23[i])
   
   # Helper function to check if element exists
   element_exists <- function(using, value) {
@@ -155,7 +155,7 @@ for (i in 1:length(urls16)){
 }
 toc()
 
-housing_data_page16 <- tibble(
+housing_data_page23 <- tibble(
   price = Price,
   bhk = Bhk ,
   area_sqft = Area_sqft,
@@ -166,4 +166,4 @@ housing_data_page16 <- tibble(
   locational_advantages = Locational_advantages,
   distance_to_locational_advantage = Distance_to_locational_advantage 
 )
-rm(urls16)
+rm(urls23)
