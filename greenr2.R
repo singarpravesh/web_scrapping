@@ -21,6 +21,10 @@ kolkata_boundary_lines <- kolkata_boundary$osm_lines
  # kolkata_boundary_polygon <- kolkata_boundary$osm_polygons
 #}
 
+###############
+# https://rspatialdata.github.io/osm.html
+# using the ggmap package
+library(ggmap)
 
 
 
