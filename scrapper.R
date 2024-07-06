@@ -6,7 +6,7 @@ rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), ve
 remDr <- rD[["client"]]
 
 # navigate to page 6
-remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page-23")
+remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page-25")
 
 # Get all the urls in page 4
 urls <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
@@ -156,7 +156,7 @@ for (i in 1:length(urls)){
 }
 toc()
 
-housing_data_page23 <- tibble(
+housing_data_page25 <- tibble(
   price = Price,
   bhk = Bhk ,
   area_sqft = Area_sqft,
