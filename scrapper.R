@@ -1,20 +1,19 @@
 
 
 # Activate firefox
-urls <- c()
-for (j in 23:50){
+
 rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
 remDr <- rD[["client"]]
 
 # navigate to page 6
-remDr$navigate(paste0("https://www.99acres.com/property-in-kolkata-ffid-page-", j))
+remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page-23")
 
 # Get all the urls in page 4
-urls[j] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
+urls <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
   sapply(function(x){x$getElementAttribute("href")}[[1]])
 remDr$closeWindow()
 rD$server$stop()
-}
+
 # Initalise the variables
 Price <- c()
 
@@ -37,7 +36,7 @@ for (i in 1:length(urls)){
   remDr <- rD[["client"]]
   
   # Navigate to the URL
-  remDr$navigate(urls23[i])
+  remDr$navigate(urls[i])
   
   # Helper function to check if element exists
   element_exists <- function(using, value) {
@@ -168,4 +167,4 @@ housing_data_page23 <- tibble(
   locational_advantages = Locational_advantages,
   distance_to_locational_advantage = Distance_to_locational_advantage 
 )
-rm(urls23)
+rm(urls)
