@@ -1,18 +1,20 @@
 
 
 # Activate firefox
+urls <- c()
+for (j in 23:50){
 rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
 remDr <- rD[["client"]]
 
 # navigate to page 6
-remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page-23")
+remDr$navigate(paste0("https://www.99acres.com/property-in-kolkata-ffid-page-", j))
 
 # Get all the urls in page 4
-urls23 <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
+urls[j] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
   sapply(function(x){x$getElementAttribute("href")}[[1]])
 remDr$closeWindow()
 rD$server$stop()
-
+}
 # Initalise the variables
 Price <- c()
 
@@ -29,7 +31,7 @@ Locational_advantages <- list()
 Distance_to_locational_advantage <- list()
 
 tic("Time")
-for (i in 1:length(urls23)){
+for (i in 1:length(urls)){
   # Initialize RSelenium
   rD <- rsDriver(browser="firefox", chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
