@@ -122,15 +122,27 @@ for (i in 1:length(urls)){
     remDr$setTimeout(type = "implicit", milliseconds = 20000) # Wait to load the page
     if (element_exists("css", "#LANDMARK_VIEW_ALL")) {
       remDr$findElement(using = "css", value = "#LANDMARK_VIEW_ALL")$clickElement()
+      remDr$executeScript("window.scrollTo(0,700);") # Scroll to the specific section
       html_page <- remDr$getPageSource()[[1]]
-        remDr$findElement(using = "css", value = "LandmarkCarousel__selectedState")$clickElement()
         Locational_advantages <- read_html(html_page) |> 
         html_nodes('div[class="RoadDistanceBtmSheet__itemName"]') %>% 
         html_text() %>% list()
   } else {
       Locational_advantages <- NA
+  }
+    ### Next location
+    if (element_exists("css", "LandmarkCarousel__normalState")) {
+      remDr$findElement(using = "css", value = "iconS_Common_24 icon_close pageComponent")$clickElement()
+      remDr$findElement(using = "css", value = "#LANDMARK_VIEW_ALL")$clickElement()
+      remDr$findElement(using = "css", value = "LandmarkCarousel__normalState")$clickElement()
+      remDr$executeScript("window.scrollTo(0,300);") # Scroll to the specific section
+      html_page <- remDr$getPageSource()[[1]]
+      Locational_advantages <- read_html(html_page) |> 
+        html_nodes('div[class="RoadDistanceBtmSheet__itemName"]') %>% 
+        html_text() %>% list()
+    } else {
+      Locational_advantages <- NA
     }
-    
     
     if (!is.na(Locational_advantages[i])){  
       Distance_to_locational_advantage[i]<- read_html(html_page) |> 
