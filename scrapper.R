@@ -28,7 +28,7 @@ Top_facilities <- list()
 Other_facilities <- list()
 Locational_advantages <- list()
 Distance_to_locational_advantage <- list()
-
+housing_data_page <- tibble()
 tic("Time")
 for (i in 1:3){
   # Initialize RSelenium
@@ -56,7 +56,7 @@ for (i in 1:3){
   # Data for price
   if (element_exists("xpath", "//*[@class='component__pdPropValue']")) {
     Price[i] <- remDr$findElements(using = "xpath", "//*[@class='component__pdPropValue']") |> 
-      sapply(function(x){x$getElementText()[[1]]})
+      sapply(function(x){x$getElementText()[[1]]}) |> list()
   } else {
     Price[i] <- NA
   }
@@ -64,7 +64,7 @@ for (i in 1:3){
   # BHK data
   if (element_exists("xpath", "//*[@class='component__pdPropDetail2Heading']")) {
     Bhk[i] <- remDr$findElements(using = "xpath", "//*[@class='component__pdPropDetail2Heading']") |> 
-      sapply(function(x){x$getElementText()[[1]]})
+      sapply(function(x){x$getElementText()[[1]]}) |> list()
   } else {
     Bhk[i] <- NA
   }
@@ -334,10 +334,10 @@ for (i in 1:3){
   remove(rD)
   remove(remDr)
   gc()
-  
+}
   housing_data_page[i] <- tibble(
     price = Price,
-    bhk = Bhk ,
+    bhk = Bhk,
     area_sqft = Area_sqft,
     latitude = Latitude ,
     longitude = Longitude ,
@@ -347,7 +347,6 @@ for (i in 1:3){
     distance_to_locational_advantage = Distance_to_locational_advantage 
   )
 
-}
 toc()
 
 
