@@ -6,10 +6,10 @@ rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), ve
 remDr <- rD[["client"]]
 
 # navigate to page 6
-remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page-25")
-
+remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page-26")
+  
 # Get all the urls in page 4
-urls <- remDr$findElements(using = "xpath", "//*[@class='ellipsis']") |> 
+urls <- remDr$findElements(using = "xpath", "//*[@class='tupleNew__propertyHeading ellipsis']") |> 
   sapply(function(x){x$getElementAttribute("href")}[[1]])
 remDr$closeWindow()
 rD$server$stop()
@@ -36,7 +36,7 @@ for (i in 1:length(urls)){
   remDr <- rD[["client"]]
   
   # Navigate to the URL
-  remDr$navigate(urls[i])
+  remDr$navigate(urls[1])
   
   # Helper function to check if element exists
   element_exists <- function(using, value) {
@@ -44,35 +44,34 @@ for (i in 1:length(urls)){
   }
   
   # Click the OK button if it exists
-  if (element_exists("css", ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")) {
-    remDr$findElement(using = "css", value = ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")$clickElement()
-  } else {
-    message("OK button not found or could not be clicked")
-  }
+  #if (element_exists("css", ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")) {
+  #  remDr$findElement(using = "css", value = ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")$clickElement()
+#  } else {
+#    message("OK button not found or could not be clicked")
+ # }
   
   # Data for price
-  if (element_exists("xpath", "//*[@class='list_header_semiBold configurationCards__configurationCardsHeading']")) {
-    Price[i] <- remDr$findElements(using = "xpath", "//*[@class='list_header_semiBold configurationCards__configurationCardsHeading']") |> 
+  if (element_exists("xpath", "//*[@class='component__pdPropValue']")) {
+    Price <- remDr$findElements(using = "xpath", "//*[@class='component__pdPropValue']") |> 
       sapply(function(x){x$getElementText()[[1]]})
   } else {
-    Price[i] <- NA
+    Price <- NA
   }
   
   # BHK data
-  if (element_exists("xpath", "//*[@class='ellipsis list_header_semiBold configurationCards__configurationCardsSubHeading']")) {
-    Bhk[i] <- remDr$findElements(using = "xpath", "//*[@class='ellipsis list_header_semiBold configurationCards__configurationCardsSubHeading']") |> 
+  if (element_exists("xpath", "//*[@class='component__pdPropDetail2Heading']")) {
+    Bhk <- remDr$findElements(using = "xpath", "//*[@class='component__pdPropDetail2Heading']") |> 
       sapply(function(x){x$getElementText()[[1]]})
   } else {
-    Bhk[i] <- NA
+    Bhk <- NA
   }
   
   # Area data
-  if (element_exists("xpath", "//*[@class='caption_subdued_medium configurationCards__cardAreaSubHeadingOne']")) {
-    Area_sqft[i] <- remDr$findElements(using = "xpath", "//*[@class='caption_subdued_medium configurationCards__cardAreaSubHeadingOne']") |> 
-      sapply(function(x){x$getElementText()[[1]]}) %>% 
-      list()
+  if (element_exists("xpath", "//*[@class=' component__details component__details2']")) {
+    Area_sqft <- remDr$findElements(using = "xpath", "//*[@class=' component__details component__details2']") |> 
+      sapply(function(x){x$getElementText()[[1]]}) 
   } else {
-    Area_sqft[i] <- NA
+    Area_sqft <- NA
   }
   
   # Coordinates of the property
@@ -84,7 +83,7 @@ for (i in 1:length(urls)){
       json_str <- html_text(x)
       fromJSON(json_str)
     })
-    Latitude[i] <- json_ld_data[[3]]$geo$latitude
+    Latitude <- json_ld_data[[1]]$geo$latitude[1]
     Longitude[i] <- json_ld_data[[3]]$geo$longitude
   }, error = function(e) {
     message("Coordinates not found: ", e$message)
@@ -156,7 +155,7 @@ for (i in 1:length(urls)){
 }
 toc()
 
-housing_data_page25 <- tibble(
+housing_data_page26 <- tibble(
   price = Price,
   bhk = Bhk ,
   area_sqft = Area_sqft,
