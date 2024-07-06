@@ -28,7 +28,7 @@ Top_facilities <- list()
 Other_facilities <- list()
 Locational_advantages <- list()
 Distance_to_locational_advantage <- list()
-housing_data_page <- tibble()
+
 tic("Time")
 for (i in 1:3){
   # Initialize RSelenium
