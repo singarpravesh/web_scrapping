@@ -37,6 +37,9 @@ for (i in 1:3){
   
   # Navigate to the URL
   remDr$navigate(urls[i])
+  remDr$setTimeout(type = "implicit", milliseconds = 20000) # Wait to load the page
+  remDr$setTimeout(type = "implicit", milliseconds = 20000) # Wait to load the page
+  remDr$setTimeout(type = "implicit", milliseconds = 20000) # Wait to load the page
   
   # Helper function to check if element exists
   element_exists <- function(using, value) {
@@ -343,7 +346,7 @@ for (i in 1:3){
     locational_advantages = Locational_advantages,
     distance_to_locational_advantage = Distance_to_locational_advantage 
   )
-  rm(urls[i])
+
 }
 toc()
 
