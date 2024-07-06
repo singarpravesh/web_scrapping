@@ -84,7 +84,7 @@ for (i in 1:length(urls)){
       fromJSON(json_str)
     })
     Latitude <- json_ld_data[[1]]$geo$latitude[1]
-    Longitude[i] <- json_ld_data[[3]]$geo$longitude
+    Longitude <- json_ld_data[[1]]$geo$longitude[1]
   }, error = function(e) {
     message("Coordinates not found: ", e$message)
   })
@@ -100,7 +100,7 @@ for (i in 1:length(urls)){
   
   # Other facilities
   tryCatch({
-    remDr$executeScript("window.scrollTo(0,1700);") # Scroll to the specific section
+    remDr$executeScript("window.scrollTo(0,400);") # Scroll to the specific section
     remDr$setTimeout(type = "implicit", milliseconds = 21000) # Wait to load the page
     if (element_exists("css", ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")) {
       remDr$findElement(using = "css", value = ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")$clickElement()
@@ -118,18 +118,19 @@ for (i in 1:length(urls)){
   
   # Locational advantages
   tryCatch({
-    remDr$executeScript("window.scrollTo(0,2100);") # Scroll to the specific section
+    remDr$executeScript("window.scrollTo(0,700);") # Scroll to the specific section
     remDr$setTimeout(type = "implicit", milliseconds = 20000) # Wait to load the page
-    if (element_exists("css", ".OrderComponent__leftSection > div:nth-child(5) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > a:nth-child(2)")) {
-      remDr$findElement(using = "css", value = ".OrderComponent__leftSection > div:nth-child(5) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > a:nth-child(2)")$clickElement()
+    if (element_exists("css", "#LANDMARK_VIEW_ALL")) {
+      remDr$findElement(using = "css", value = "#LANDMARK_VIEW_ALL")$clickElement()
       html_page <- remDr$getPageSource()[[1]]
-      
-      Locational_advantages[i] <- read_html(html_page) |> 
-        html_nodes('div[class="list_header_semiBold spacer2 ellipsis"]') %>% 
+        remDr$findElement(using = "css", value = "LandmarkCarousel__selectedState")$clickElement()
+        Locational_advantages <- read_html(html_page) |> 
+        html_nodes('div[class="RoadDistanceBtmSheet__itemName"]') %>% 
         html_text() %>% list()
-    } else {
-      Locational_advantages[i] <- NA
+  } else {
+      Locational_advantages <- NA
     }
+    
     
     if (!is.na(Locational_advantages[i])){  
       Distance_to_locational_advantage[i]<- read_html(html_page) |> 
