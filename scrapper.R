@@ -30,13 +30,13 @@ Locational_advantages <- list()
 Distance_to_locational_advantage <- list()
 
 tic("Time")
-for (i in 1:length(urls)){
+for (i in 1:3){
   # Initialize RSelenium
   rD <- rsDriver(browser="firefox", chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
   
   # Navigate to the URL
-  remDr$navigate(urls[1])
+  remDr$navigate(urls[i])
   
   # Helper function to check if element exists
   element_exists <- function(using, value) {
@@ -52,26 +52,26 @@ for (i in 1:length(urls)){
   
   # Data for price
   if (element_exists("xpath", "//*[@class='component__pdPropValue']")) {
-    Price <- remDr$findElements(using = "xpath", "//*[@class='component__pdPropValue']") |> 
+    Price[i] <- remDr$findElements(using = "xpath", "//*[@class='component__pdPropValue']") |> 
       sapply(function(x){x$getElementText()[[1]]})
   } else {
-    Price <- NA
+    Price[i] <- NA
   }
   
   # BHK data
   if (element_exists("xpath", "//*[@class='component__pdPropDetail2Heading']")) {
-    Bhk <- remDr$findElements(using = "xpath", "//*[@class='component__pdPropDetail2Heading']") |> 
+    Bhk[i] <- remDr$findElements(using = "xpath", "//*[@class='component__pdPropDetail2Heading']") |> 
       sapply(function(x){x$getElementText()[[1]]})
   } else {
-    Bhk <- NA
+    Bhk[i] <- NA
   }
   
   # Area data
   if (element_exists("xpath", "//*[@class=' component__details component__details2']")) {
-    Area_sqft <- remDr$findElements(using = "xpath", "//*[@class=' component__details component__details2']") |> 
+    Area_sqft[i] <- remDr$findElements(using = "xpath", "//*[@class=' component__details component__details2']") |> 
       sapply(function(x){x$getElementText()[[1]]}) 
   } else {
-    Area_sqft <- NA
+    Area_sqft[i] <- NA
   }
   
   # Coordinates of the property
@@ -83,8 +83,8 @@ for (i in 1:length(urls)){
       json_str <- html_text(x)
       fromJSON(json_str)
     })
-    Latitude <- json_ld_data[[1]]$geo$latitude[1]
-    Longitude <- json_ld_data[[1]]$geo$longitude[1]
+    Latitude[i] <- json_ld_data[[1]]$geo$latitude[1]
+    Longitude[i] <- json_ld_data[[1]]$geo$longitude[1]
   }, error = function(e) {
     message("Coordinates not found: ", e$message)
   })
@@ -100,14 +100,14 @@ for (i in 1:length(urls)){
   
   # Other facilities
   tryCatch({
-    remDr$executeScript("window.scrollTo(0,400);") # Scroll to the specific section
+    remDr$executeScript("window.scrollTo(0,1200);") # Scroll to the specific section
     remDr$setTimeout(type = "implicit", milliseconds = 21000) # Wait to load the page
-    if (element_exists("css", ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")) {
-      remDr$findElement(using = "css", value = ".UniquesFacilities__pageHeadingWrapper > a:nth-child(2)")$clickElement()
+    if (element_exists("css", "#features > li:nth-child(1) > div:nth-child(2)")) {
+      remDr$findElement(using = "css", value = "#features > li:nth-child(1) > div:nth-child(2)")
       html_page <- remDr$getPageSource()[[1]] # Get the HTML content of the pop up page after click
       
       Other_facilities[i] <- read_html(html_page) |> 
-        html_nodes('div[class="body_med"]') %>% 
+        html_nodes('div[class="#features > li:nth-child(1) > div:nth-child(2)"]') %>% 
         html_text() %>% list()
     } else {
       Other_facilities[i] <- NA
@@ -124,30 +124,196 @@ for (i in 1:length(urls)){
       remDr$findElement(using = "css", value = "#LANDMARK_VIEW_ALL")$clickElement()
       remDr$executeScript("window.scrollTo(0,700);") # Scroll to the specific section
       html_page <- remDr$getPageSource()[[1]]
-        Locational_advantages <- read_html(html_page) |> 
+        La1 <- read_html(html_page) |> 
         html_nodes('div[class="RoadDistanceBtmSheet__itemName"]') %>% 
         html_text() %>% list()
   } else {
-      Locational_advantages <- NA
+      La1 <- NA
   }
     ### Next location
-    if (element_exists("css", "LandmarkCarousel__normalState")) {
-      remDr$findElement(using = "css", value = "iconS_Common_24 icon_close pageComponent")$clickElement()
+    
+    if (element_exists("css", "i.pageComponent")) {
+      remDr$findElement(using = "css", value = "i.pageComponent")$clickElement()
       remDr$findElement(using = "css", value = "#LANDMARK_VIEW_ALL")$clickElement()
-      remDr$findElement(using = "css", value = "LandmarkCarousel__normalState")$clickElement()
-      remDr$executeScript("window.scrollTo(0,300);") # Scroll to the specific section
+      remDr$findElement(using = "css", value = ".RoadDistanceBtmSheet__nudgeWrapper > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > span:nth-child(3) > span:nth-child(1)")$clickElement()
+      remDr$executeScript("window.scrollTo(0,700);") # Scroll to the specific section
       html_page <- remDr$getPageSource()[[1]]
-      Locational_advantages <- read_html(html_page) |> 
+      La2 <- read_html(html_page) |> 
+        html_nodes('div[class="RoadDistanceBtmSheet__itemName"]') %>% 
+        html_text() %>% list()
+    }else {
+      La2 <- NA
+    }
+    
+    if (element_exists("css", ".icon_goToTop")){
+      remDr$findElement(using = "css", value = ".icon_goToTop")$clickElement()
+      remDr$findElement(using = "css", value = "div.cc__CarouselBox:nth-child(2) > div:nth-child(1) > div:nth-child(3) > span:nth-child(3) > span:nth-child(1)")$clickElement()
+      remDr$executeScript("window.scrollTo(0,700);") # Scroll to the specific section
+      html_page <- remDr$getPageSource()[[1]]
+      La3 <- read_html(html_page) |> 
         html_nodes('div[class="RoadDistanceBtmSheet__itemName"]') %>% 
         html_text() %>% list()
     } else {
-      Locational_advantages <- NA
+      La3 <- NA
     }
     
-    if (!is.na(Locational_advantages[i])){  
-      Distance_to_locational_advantage[i]<- read_html(html_page) |> 
-        html_nodes('div[class="caption_subdued_medium ellipsis"]') %>% 
+    if (element_exists("css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")){  
+      remDr$findElement(using = "css", value = "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")$clickElement()
+      remDr$findElement(using = "css", value = "div.cc__CarouselBox:nth-child(2) > div:nth-child(1) > div:nth-child(4) > span:nth-child(3) > span:nth-child(1)")$clickElement()
+      remDr$executeScript("window.scrollTo(0,700);") # Scroll to the specific section
+      html_page <- remDr$getPageSource()[[1]]
+      La4 <- read_html(html_page) |> 
+        html_nodes('div[class="RoadDistanceBtmSheet__itemName"]') %>% 
         html_text() %>% list()
+    } else {
+      La4 <- NA
+    }
+    
+      
+    if (element_exists("css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")){  
+      remDr$findElement(using = "css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")$clickElement()
+      remDr$findElement(using = "css", value = "div.cc__CarouselBox:nth-child(2) > div:nth-child(1) > div:nth-child(5) > span:nth-child(3) > span:nth-child(1)")$clickElement()
+      remDr$executeScript("window.scrollTo(0,700);") # Scroll to the specific section
+      html_page <- remDr$getPageSource()[[1]]
+      La5 <- read_html(html_page) |> 
+        html_nodes('div[class="RoadDistanceBtmSheet__itemName"]') %>% 
+        html_text() %>% list()
+    } else {
+      La5 <- NA
+    }
+     
+    if (element_exists("css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")){  
+      remDr$findElement(using = "css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")$clickElement()
+      remDr$findElement(using = "css", value = "div.cc__CarouselBox:nth-child(2) > div:nth-child(1) > div:nth-child(6) > span:nth-child(3) > span:nth-child(1)")$clickElement()
+      remDr$executeScript("window.scrollTo(0,700);") # Scroll to the specific section
+      html_page <- remDr$getPageSource()[[1]]
+      La6 <- read_html(html_page) |> 
+        html_nodes('div[class="RoadDistanceBtmSheet__itemName"]') %>% 
+        html_text() %>% list()
+    } else {
+      La6 <- NA
+    }
+
+    if (element_exists("css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")){  
+      remDr$findElement(using = "css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")$clickElement()
+      remDr$findElement(using = "css", value = "div.cc__CarouselBox:nth-child(2) > div:nth-child(1) > div:nth-child(7) > span:nth-child(3) > span:nth-child(1)")$clickElement()
+      remDr$executeScript("window.scrollTo(0,700);") # Scroll to the specific section
+      html_page <- remDr$getPageSource()[[1]]
+      La7 <- read_html(html_page) |> 
+        html_nodes('div[class="RoadDistanceBtmSheet__itemName"]') %>% 
+        html_text() %>% list()
+    } else {
+      La7 <- NA
+    }
+    
+    if (element_exists("css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")){  
+      remDr$findElement(using = "css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")$clickElement()
+    } else {
+      La8 <- NA
+    }
+    
+  Locational_advantages[i] <- mget(paste0('La', 1:8)) |> list()  
+    
+    
+    
+    
+    if (!is.na(Locational_advantages[i])){  
+      remDr$executeScript("window.scrollTo(0,700);") # Scroll to the specific section
+      remDr$setTimeout(type = "implicit", milliseconds = 20000) # Wait to load the page
+      if (element_exists("css", "#LANDMARK_VIEW_ALL")) {
+        remDr$findElement(using = "css", value = "#LANDMARK_VIEW_ALL")$clickElement()
+        remDr$executeScript("window.scrollTo(0,700);") # Scroll to the specific section
+        html_page <- remDr$getPageSource()[[1]]
+        La1 <- read_html(html_page) |> 
+          html_nodes('div[class="RoadDistanceBtmSheet__distance"]') %>% 
+          html_text() %>% list()
+      } else {
+        La1 <- NA
+      }
+      ### Next location
+      
+      if (element_exists("css", "i.pageComponent")) {
+        remDr$findElement(using = "css", value = "i.pageComponent")$clickElement()
+        remDr$findElement(using = "css", value = "#LANDMARK_VIEW_ALL")$clickElement()
+        remDr$findElement(using = "css", value = ".RoadDistanceBtmSheet__nudgeWrapper > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > span:nth-child(3) > span:nth-child(1)")$clickElement()
+        remDr$executeScript("window.scrollTo(0,700);") # Scroll to the specific section
+        html_page <- remDr$getPageSource()[[1]]
+        La2 <- read_html(html_page) |> 
+          html_nodes('div[class="RoadDistanceBtmSheet__distance"]') %>% 
+          html_text() %>% list()
+      }else {
+        La2 <- NA
+      }
+      
+      if (element_exists("css", ".icon_goToTop")){
+        remDr$findElement(using = "css", value = ".icon_goToTop")$clickElement()
+        remDr$findElement(using = "css", value = "div.cc__CarouselBox:nth-child(2) > div:nth-child(1) > div:nth-child(3) > span:nth-child(3) > span:nth-child(1)")$clickElement()
+        remDr$executeScript("window.scrollTo(0,700);") # Scroll to the specific section
+        html_page <- remDr$getPageSource()[[1]]
+        La3 <- read_html(html_page) |> 
+          html_nodes('div[class="RoadDistanceBtmSheet__distance"]') %>% 
+          html_text() %>% list()
+      } else {
+        La3 <- NA
+      }
+      
+      if (element_exists("css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")){  
+        remDr$findElement(using = "css", value = "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")$clickElement()
+        remDr$findElement(using = "css", value = "div.cc__CarouselBox:nth-child(2) > div:nth-child(1) > div:nth-child(4) > span:nth-child(3) > span:nth-child(1)")$clickElement()
+        remDr$executeScript("window.scrollTo(0,700);") # Scroll to the specific section
+        html_page <- remDr$getPageSource()[[1]]
+        La4 <- read_html(html_page) |> 
+          html_nodes('div[class="RoadDistanceBtmSheet__distance"]') %>% 
+          html_text() %>% list()
+      } else {
+        La4 <- NA
+      }
+      
+      
+      if (element_exists("css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")){  
+        remDr$findElement(using = "css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")$clickElement()
+        remDr$findElement(using = "css", value = "div.cc__CarouselBox:nth-child(2) > div:nth-child(1) > div:nth-child(5) > span:nth-child(3) > span:nth-child(1)")$clickElement()
+        remDr$executeScript("window.scrollTo(0,700);") # Scroll to the specific section
+        html_page <- remDr$getPageSource()[[1]]
+        La5 <- read_html(html_page) |> 
+          html_nodes('div[class="RoadDistanceBtmSheet__distance"]') %>% 
+          html_text() %>% list()
+      } else {
+        La5 <- NA
+      }
+      
+      if (element_exists("css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")){  
+        remDr$findElement(using = "css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")$clickElement()
+        remDr$findElement(using = "css", value = "div.cc__CarouselBox:nth-child(2) > div:nth-child(1) > div:nth-child(6) > span:nth-child(3) > span:nth-child(1)")$clickElement()
+        remDr$executeScript("window.scrollTo(0,700);") # Scroll to the specific section
+        html_page <- remDr$getPageSource()[[1]]
+        La6 <- read_html(html_page) |> 
+          html_nodes('div[class="RoadDistanceBtmSheet__distance"]') %>% 
+          html_text() %>% list()
+      } else {
+        La6 <- NA
+      }
+      
+      if (element_exists("css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")){  
+        remDr$findElement(using = "css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")$clickElement()
+        remDr$findElement(using = "css", value = "div.cc__CarouselBox:nth-child(2) > div:nth-child(1) > div:nth-child(7) > span:nth-child(3) > span:nth-child(1)")$clickElement()
+        remDr$executeScript("window.scrollTo(0,700);") # Scroll to the specific section
+        html_page <- remDr$getPageSource()[[1]]
+        La7 <- read_html(html_page) |> 
+          html_nodes('div[class="RoadDistanceBtmSheet__distance"]') %>% 
+          html_text() %>% list()
+      } else {
+        La7 <- NA
+      }
+      
+      if (element_exists("css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")){  
+        remDr$findElement(using = "css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")$clickElement()
+      } else {
+        La8 <- NA
+      }
+      
+      Distance_to_locational_advantage[i] <- mget(paste0('La', 1:8)) |> list()  
+      
     } else {
       Distance_to_locational_advantage[i] <- NA
     }
@@ -165,18 +331,20 @@ for (i in 1:length(urls)){
   remove(rD)
   remove(remDr)
   gc()
+  
+  housing_data_page[i] <- tibble(
+    price = Price,
+    bhk = Bhk ,
+    area_sqft = Area_sqft,
+    latitude = Latitude ,
+    longitude = Longitude ,
+    top_facilities = Top_facilities,
+    other_facilities = Other_facilities,
+    locational_advantages = Locational_advantages,
+    distance_to_locational_advantage = Distance_to_locational_advantage 
+  )
+  rm(urls[i])
 }
 toc()
 
-housing_data_page26 <- tibble(
-  price = Price,
-  bhk = Bhk ,
-  area_sqft = Area_sqft,
-  latitude = Latitude ,
-  longitude = Longitude ,
-  top_facilities = Top_facilities,
-  other_facilities = Other_facilities,
-  locational_advantages = Locational_advantages,
-  distance_to_locational_advantage = Distance_to_locational_advantage 
-)
-rm(urls)
+
