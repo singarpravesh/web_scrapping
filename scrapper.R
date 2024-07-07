@@ -33,17 +33,13 @@ Locational_advantages <- list()
 Distance_to_locational_advantage <- list()
 
 tic("Time")
-for (i in 1:length(urls)){
+for (i in 6:length(urls)){
   # Initialize RSelenium
   rD <- rsDriver(browser="firefox", chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
   
   # Navigate to the URL
   remDr$navigate(urls[i])
-  remDr$setTimeout(type = "implicit", milliseconds = 20000) # Wait to load the page
-  remDr$setTimeout(type = "implicit", milliseconds = 20000) # Wait to load the page
-  remDr$setTimeout(type = "implicit", milliseconds = 20000) # Wait to load the page
-  
   # Helper function to check if element exists
   element_exists <- function(using, value) {
     length(remDr$findElements(using = using, value = value)) > 0
