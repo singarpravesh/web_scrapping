@@ -1,4 +1,8 @@
-
+library(RSelenium)
+library(rvest)
+library(jsonlite)
+library(dplyr)
+library(tictoc)
 
 # Activate firefox
 urls <- c()
@@ -7,7 +11,7 @@ urls <- c()
 rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
  remDr <- rD[["client"]]
 # navigate to page 6
-remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page-26")
+remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page-27")
 
 # Get all the urls in page 4
 urls <- remDr$findElements(using = "xpath", "//*[@class='tupleNew__propertyHeading ellipsis']") |> 
@@ -33,7 +37,7 @@ Locational_advantages <- list()
 Distance_to_locational_advantage <- list()
 
 tic("Time")
-for (i in 1:length(urls)){
+for (i in 13:length(urls)){
   # Initialize RSelenium
   rD <- rsDriver(browser="firefox", chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
@@ -64,7 +68,7 @@ for (i in 1:length(urls)){
   } else {
     Price[i] <- NA
   }
-  
+  Sys.sleep(3)
   # BHK data
   if (element_exists("xpath", "//*[@class='component__pdPropDetail2Heading']")) {
     Bhk[i] <- remDr$findElements(using = "xpath", "//*[@class='component__pdPropDetail2Heading']") |> 
@@ -72,7 +76,7 @@ for (i in 1:length(urls)){
   } else {
     Bhk[i] <- NA
   }
-  
+  Sys.sleep(3)
   # Area data
   if (element_exists("xpath", "//*[@class=' component__details component__details2']")) {
     Area_sqft[i] <- remDr$findElements(using = "xpath", "//*[@class=' component__details component__details2']") |> 
@@ -80,7 +84,7 @@ for (i in 1:length(urls)){
   } else {
     Area_sqft[i] <- NA
   }
-  
+  Sys.sleep(3)
   # Coordinates of the property
   tryCatch({
     html <- remDr$getPageSource()[[1]]
@@ -95,7 +99,7 @@ for (i in 1:length(urls)){
   }, error = function(e) {
     message("Coordinates not found: ", e$message)
   })
-  
+  Sys.sleep(3)
   # Top facilities
   tryCatch({
     Top_facilities[i] <- read_html(html) |> 
@@ -104,7 +108,7 @@ for (i in 1:length(urls)){
   }, error = function(e) {
     message("Top facilities not found: ", e$message)
   })
-  
+  Sys.sleep(3)
   # Other facilities
   tryCatch({
     remDr$executeScript("window.scrollTo(0,1200);") # Scroll to the specific section
@@ -122,7 +126,7 @@ for (i in 1:length(urls)){
   }, error = function(e) {
     message("Other facilities not found: ", e$message)
   })
-  
+  Sys.sleep(3)
   # Locational advantages
   tryCatch({
     remDr$executeScript("window.scrollTo(0,700);") # Scroll to the specific section
@@ -222,7 +226,7 @@ for (i in 1:length(urls)){
   Locational_advantages[i] <- mget(paste0('La', 1:8)) |> list()  
     
     
-    
+  Sys.sleep(3)
     
     if (!is.na(Locational_advantages[i])){  
       remDr$executeScript("window.scrollTo(0,700);") # Scroll to the specific section
@@ -338,8 +342,9 @@ for (i in 1:length(urls)){
   remove(rD)
   remove(remDr)
   gc()
+  Sys.sleep(3)
 }
-  housing_data_page26 <- tibble(
+  housing_data_page27 <- tibble(
     price = Price,
     bhk = Bhk,
     area_sqft = Area_sqft,
