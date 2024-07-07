@@ -33,7 +33,7 @@ Locational_advantages <- list()
 Distance_to_locational_advantage <- list()
 
 tic("Time")
-for (i in 6:length(urls)){
+for (i in 1:length(urls)){
   # Initialize RSelenium
   rD <- rsDriver(browser="firefox", chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
@@ -51,7 +51,12 @@ for (i in 6:length(urls)){
 #  } else {
 #    message("OK button not found or could not be clicked")
  # }
-  
+  # Click the OK button if it exists
+  if (element_exists("css", ".component__close")) {
+    remDr$findElement(using = "css", value = ".component__close")$clickElement()
+  } else {
+    message("OK button not found or could not be clicked")
+  }
   # Data for price
   if (element_exists("xpath", "//*[@class='component__pdPropValue']")) {
     Price[i] <- remDr$findElements(using = "xpath", "//*[@class='component__pdPropValue']") |> 
