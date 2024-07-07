@@ -3,9 +3,12 @@
 # Activate firefox
 urls <- c()
 
-rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
-remDr <- rD[["client"]]
+
 for (j in 26:100){
+  rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
+  remDr$setTimeout(type = "implicit", milliseconds = 80000) # Wait to load the page
+  
+   remDr <- rD[["client"]]
 # navigate to page 6
 remDr$navigate(paste0("https://www.99acres.com/property-in-kolkata-ffid-page-", j))
 remDr$setTimeout(type = "implicit", milliseconds = 20000) # Wait to load the page
@@ -13,12 +16,17 @@ remDr$setTimeout(type = "implicit", milliseconds = 20000) # Wait to load the pag
 remDr$setTimeout(type = "implicit", milliseconds = 20000) # Wait to load the page
 
 # Get all the urls in page 4
-urls[j] <- remDr$findElements(using = "xpath", "//*[@class='tupleNew__propertyHeading ellipsis']") |> 
-  sapply(function(x){x$getElementAttribute("href")}[[1]])
+urls <- remDr$findElements(using = "xpath", "//*[@class='tupleNew__propertyHeading ellipsis']") |> 
+  sapply(function(x){x$getElementAttribute("href")}[[1]]) |> 
+  list()
+remDr$setTimeout(type = "implicit", milliseconds = 80000) # Wait to load the page
+
+remDr$closeWindow()
+remDr$setTimeout(type = "implicit", milliseconds = 20000) # Wait to load the page
 
 rD$server$stop()
-remDr$closeWindow()
 }
+
 # Initalise the variables
 Price <- c()
 
