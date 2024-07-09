@@ -11,7 +11,7 @@ urls <- c()
 rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
  remDr <- rD[["client"]]
 # navigate to page 6
-remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page-26")
+remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page-30")
 
 # Get all the urls in page 4
 urls <- remDr$findElements(using = "xpath", "//*[@class='tupleNew__propertyHeading ellipsis']") |> 
@@ -22,19 +22,19 @@ remDr$closeWindow()
 rD$server$stop()
 
 # Initalise the variables
-Price <- list()
+Price <- c()
 
 # Structural variables 
 Bhk <- list() # No of rooms (1,2,3,4)
-Area_sqft <- list() 
+Area_sqft <- c() 
 
 # Locational variables
 Latitude <- c()
 Longitude <- c()
 Top_facilities <- list()
 Other_facilities <- list()
-Locational_advantages <- list()
-Distance_to_locational_advantage <- list()
+Locational_advantages <- c()
+Distance_to_locational_advantage <- c()
 
 tic("Time")
 for (i in 1:length(urls)){
@@ -44,11 +44,12 @@ for (i in 1:length(urls)){
   
   # Navigate to the URL
   remDr$navigate(urls[i])
+  Sys.sleep(5)
   # Helper function to check if element exists
   element_exists <- function(using, value) {
     length(remDr$findElements(using = using, value = value)) > 0
   }
-  
+  Sys.sleep(5)
   # Click the OK button if it exists
   #if (element_exists("css", ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")) {
   #  remDr$findElement(using = "css", value = ".ReraDisclaimer__topDisclaimer > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)")$clickElement()
@@ -61,10 +62,11 @@ for (i in 1:length(urls)){
   } else {
     message("OK button not found or could not be clicked")
   }
+  Sys.sleep(5)
   # Data for price
   if (element_exists("xpath", "//*[@class='component__pdPropValue']")) {
     Price[i] <- remDr$findElements(using = "xpath", "//*[@class='component__pdPropValue']") |> 
-      sapply(function(x){x$getElementText()[[1]]})
+      sapply(function(x){x$getElementText()[[1]]}) |> list()
   } else {
     Price[i] <- NA
   }
@@ -72,7 +74,7 @@ for (i in 1:length(urls)){
   # BHK data
   if (element_exists("xpath", "//*[@class='component__pdPropDetail2Heading']")) {
     Bhk[i] <- remDr$findElements(using = "xpath", "//*[@class='component__pdPropDetail2Heading']") |> 
-      sapply(function(x){x$getElementText()[[1]]}) 
+      sapply(function(x){x$getElementText()[[1]]}) |> list()
   } else {
     Bhk[i] <- NA
   }
@@ -142,7 +144,7 @@ for (i in 1:length(urls)){
       La1 <- NA
   }
     ### Next location
-    
+    Sys.sleep(5)
     if (element_exists("css", "i.pageComponent")) {
       remDr$findElement(using = "css", value = "i.pageComponent")$clickElement()
       remDr$findElement(using = "css", value = "#LANDMARK_VIEW_ALL")$clickElement()
@@ -155,7 +157,7 @@ for (i in 1:length(urls)){
     }else {
       La2 <- NA
     }
-    
+    Sys.sleep(2)
     if (element_exists("css", ".icon_goToTop")){
       remDr$findElement(using = "css", value = ".icon_goToTop")$clickElement()
       remDr$findElement(using = "css", value = "div.cc__CarouselBox:nth-child(2) > div:nth-child(1) > div:nth-child(3) > span:nth-child(3) > span:nth-child(1)")$clickElement()
@@ -167,7 +169,7 @@ for (i in 1:length(urls)){
     } else {
       La3 <- NA
     }
-    
+    Sys.sleep(2)
     if (element_exists("css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")){  
       remDr$findElement(using = "css", value = "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")$clickElement()
       remDr$findElement(using = "css", value = "div.cc__CarouselBox:nth-child(2) > div:nth-child(1) > div:nth-child(4) > span:nth-child(3) > span:nth-child(1)")$clickElement()
@@ -180,7 +182,7 @@ for (i in 1:length(urls)){
       La4 <- NA
     }
     
-      
+    Sys.sleep(2) 
     if (element_exists("css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")){  
       remDr$findElement(using = "css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")$clickElement()
       remDr$findElement(using = "css", value = "div.cc__CarouselBox:nth-child(2) > div:nth-child(1) > div:nth-child(5) > span:nth-child(3) > span:nth-child(1)")$clickElement()
@@ -192,7 +194,7 @@ for (i in 1:length(urls)){
     } else {
       La5 <- NA
     }
-     
+    Sys.sleep(2)
     if (element_exists("css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")){  
       remDr$findElement(using = "css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")$clickElement()
       remDr$findElement(using = "css", value = "div.cc__CarouselBox:nth-child(2) > div:nth-child(1) > div:nth-child(6) > span:nth-child(3) > span:nth-child(1)")$clickElement()
@@ -204,7 +206,7 @@ for (i in 1:length(urls)){
     } else {
       La6 <- NA
     }
-
+    Sys.sleep(2)
     if (element_exists("css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")){  
       remDr$findElement(using = "css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")$clickElement()
       remDr$findElement(using = "css", value = "div.cc__CarouselBox:nth-child(2) > div:nth-child(1) > div:nth-child(7) > span:nth-child(3) > span:nth-child(1)")$clickElement()
@@ -216,13 +218,13 @@ for (i in 1:length(urls)){
     } else {
       La7 <- NA
     }
-    
+    Sys.sleep(2)
     if (element_exists("css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")){  
       remDr$findElement(using = "css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")$clickElement()
     } else {
       La8 <- NA
     }
-    
+    Sys.sleep(5)
   Locational_advantages[i] <- mget(paste0('La', 1:8)) |> list()  
     
     
@@ -242,7 +244,7 @@ for (i in 1:length(urls)){
         Lad1 <- NA
       }
       ### Next location
-      
+      Sys.sleep(2)
       if (element_exists("css", "i.pageComponent")) {
         remDr$findElement(using = "css", value = "i.pageComponent")$clickElement()
         remDr$findElement(using = "css", value = "#LANDMARK_VIEW_ALL")$clickElement()
@@ -255,7 +257,7 @@ for (i in 1:length(urls)){
       }else {
         Lad2 <- NA
       }
-      
+      Sys.sleep(2)
       if (element_exists("css", ".icon_goToTop")){
         remDr$findElement(using = "css", value = ".icon_goToTop")$clickElement()
         remDr$findElement(using = "css", value = "div.cc__CarouselBox:nth-child(2) > div:nth-child(1) > div:nth-child(3) > span:nth-child(3) > span:nth-child(1)")$clickElement()
@@ -267,7 +269,7 @@ for (i in 1:length(urls)){
       } else {
         Lad3 <- NA
       }
-      
+      Sys.sleep(2)
       if (element_exists("css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")){  
         remDr$findElement(using = "css", value = "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")$clickElement()
         remDr$findElement(using = "css", value = "div.cc__CarouselBox:nth-child(2) > div:nth-child(1) > div:nth-child(4) > span:nth-child(3) > span:nth-child(1)")$clickElement()
@@ -292,7 +294,7 @@ for (i in 1:length(urls)){
       } else {
         Lad5 <- NA
       }
-      
+      Sys.sleep(2)
       if (element_exists("css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")){  
         remDr$findElement(using = "css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")$clickElement()
         remDr$findElement(using = "css", value = "div.cc__CarouselBox:nth-child(2) > div:nth-child(1) > div:nth-child(6) > span:nth-child(3) > span:nth-child(1)")$clickElement()
@@ -304,7 +306,7 @@ for (i in 1:length(urls)){
       } else {
         Lad6 <- NA
       }
-      
+      Sys.sleep(2)
       if (element_exists("css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")){  
         remDr$findElement(using = "css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")$clickElement()
         remDr$findElement(using = "css", value = "div.cc__CarouselBox:nth-child(2) > div:nth-child(1) > div:nth-child(7) > span:nth-child(3) > span:nth-child(1)")$clickElement()
@@ -316,7 +318,7 @@ for (i in 1:length(urls)){
       } else {
         Lad7 <- NA
       }
-      
+      Sys.sleep(2)
       if (element_exists("css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")){  
         remDr$findElement(using = "css", "div.cc__whiteBg:nth-child(3) > i:nth-child(1)")$clickElement()
       } else {
@@ -348,12 +350,12 @@ for (i in 1:length(urls)){
 
 toc()
 
-housing_data_page26 <- tibble(
+housing_data_page30 <- tibble(
     price = Price,
     bhk = Bhk,
-    area_sqft = Area_sqft,
-    latitude = Latitude ,
-    longitude = Longitude ,
+    area_sqft = as.list(Area_sqft),
+    latitude = as.character(Latitude) ,
+    longitude = as.character(Longitude) ,
     top_facilities = Top_facilities,
     other_facilities = Other_facilities,
     locational_advantages = Locational_advantages,
