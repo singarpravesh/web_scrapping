@@ -11,7 +11,7 @@ urls <- c()
 rD <- rsDriver(browser="firefox",chromever = NULL, port=netstat::free_port(), verbose=F)
  remDr <- rD[["client"]]
 # navigate to page 6
-remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page-31")
+remDr$navigate("https://www.99acres.com/property-in-kolkata-ffid-page-33")
 
 # Get all the urls in page 4
 urls <- remDr$findElements(using = "xpath", "//*[@class='tupleNew__propertyHeading ellipsis']") |> 
@@ -37,7 +37,7 @@ Locational_advantages <- c()
 Distance_to_locational_advantage <- c()
 
 tic("Time")
-for (i in 10:length(urls)){
+for (i in 13:length(urls)){
   # Initialize RSelenium
   rD <- rsDriver(browser="firefox", chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
@@ -350,14 +350,14 @@ for (i in 10:length(urls)){
 
 toc()
 
-housing_data_page31 <- tibble(
-    price = Price[1:23] ,
-    bhk = Bhk[1:23] ,
-    area_sqft = as.list(Area_sqft[1:23] ),
-    latitude = as.character(Latitude[1:23]) ,
-    longitude = as.character(Longitude[1:23]) ,
-    top_facilities = Top_facilities[1:23] ,
-    other_facilities = Other_facilities[1:23] ,
-    locational_advantages = Locational_advantages[1:23] ,
-    distance_to_locational_advantage = Distance_to_locational_advantage[1:23]  
+housing_data_page33 <- tibble(
+    price = Price ,
+    bhk = Bhk ,
+    area_sqft = as.list(Area_sqft),
+    latitude = as.character(Latitude) ,
+    longitude = as.character(Longitude) ,
+    top_facilities = Top_facilities ,
+    other_facilities = Other_facilities ,
+    locational_advantages = Locational_advantages,
+    distance_to_locational_advantage = Distance_to_locational_advantage  
   )
