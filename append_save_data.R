@@ -2,7 +2,7 @@ library(tidyverse)
 housing_data1 <- mget(paste0('housing_data_page', 1:25)) |> 
   bind_rows()
 
-housing_data2 <- mget(paste0('housing_data_page', 26:31)) |> 
+housing_data2 <- mget(paste0('housing_data_page', 26:32)) |> 
   bind_rows() |> 
   unnest_wider(c(1, 2),names_sep = "_") |> 
   select(c(1,3,5:11)) |> 

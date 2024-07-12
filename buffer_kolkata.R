@@ -80,6 +80,10 @@ ggplot() +
   coord_sf(xlim = kolkata_bbox_extended[c(1,3)], 
            ylim = kolkata_bbox_extended[c(2,4)])
 
+
+st_join(housing_data_buffer, kolkata_green_spaces$osm_polygons, left = TRUE) |> 
+  ggplot()+
+  geom_sf( fill = "lightgrey")
 # Data within the buffer of 20 km
 housing_data_buffer
 kolkata_green_spaces$osm_polygons
