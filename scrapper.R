@@ -37,7 +37,7 @@ Locational_advantages <- c()
 Distance_to_locational_advantage <- c()
 
 tic("Time")
-for (i in 13:length(urls)){
+for (i in 1:length(urls)){
   # Initialize RSelenium
   rD <- rsDriver(browser="firefox", chromever = NULL, port=netstat::free_port(), verbose=F)
   remDr <- rD[["client"]]
@@ -351,13 +351,13 @@ for (i in 13:length(urls)){
 toc()
 
 housing_data_page33 <- tibble(
-    price = Price ,
-    bhk = Bhk ,
-    area_sqft = as.list(Area_sqft),
-    latitude = as.character(Latitude) ,
-    longitude = as.character(Longitude) ,
-    top_facilities = Top_facilities ,
-    other_facilities = Other_facilities ,
-    locational_advantages = Locational_advantages,
-    distance_to_locational_advantage = Distance_to_locational_advantage  
+    price = Price[1:24] ,
+    bhk = Bhk[1:24] ,
+    area_sqft = as.list(Area_sqft[1:24]),
+    latitude = as.character(Latitude[1:24]) ,
+    longitude = as.character(Longitude[1:24]) ,
+    top_facilities = Top_facilities[1:24] ,
+    other_facilities = Other_facilities[1:24] ,
+    locational_advantages = Locational_advantages[1:24],
+    distance_to_locational_advantage = Distance_to_locational_advantage[1:24]  
   )
