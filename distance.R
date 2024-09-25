@@ -29,7 +29,7 @@ parks_coords <- st_coordinates(parks)
 # Create a leaflet map
 leaflet() %>%
   addTiles() %>%
-  addPolygons(data = parks, color = "green", weight = 1, fillColor = "green", fillOpacity = 0.5) %>%
+  addPolygons(data = parks[9,], color = "green", weight = 1, fillColor = "green", fillOpacity = 0.5) %>%
   setView(lng = 88.3639, lat = 22.5726, zoom = 12)
 
 # Save the data to a CSV file
