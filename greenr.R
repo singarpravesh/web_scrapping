@@ -1,7 +1,10 @@
 # install.packages("remotes") # Uncomment if you do not have the 'remotes' package installed
 # remotes::install_github("sachit27/greenR", dependencies = TRUE)
+
 library(greenR)
 library(leaflet)
+library(tidyverse)
+library(osmdata)
 
 data <- get_osm_data("Kolkata, India")
 
@@ -38,10 +41,11 @@ trees_data$osm_points %>%
   summarise(n())
 
 
-
+# requires osmdata package
 kolkata_boundary <- opq("Kolkata, India") %>%
   add_osm_feature(key = "boundary", value = "administrative") %>%
   osmdata_sf()
+
 kolkata_boundary <- kolkata_boundary$osm_multipolygons %>% filter(name == "Kolkata")
 # overlay housing data and green spaces data
 leaflet() %>%
@@ -62,5 +66,4 @@ leaflet() %>%
               weight = 1, group = "Green Spaces") %>% 
   addPolygons(data = kolkata_boundary$geometry, fill = "yellow")
   
-
 
